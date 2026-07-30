@@ -1,0 +1,122 @@
+@startuml TraceLink_High_Level_Use_Case
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam actor {
+    BorderColor DarkSlateGray
+    FontColor Black
+}
+
+skinparam usecase {
+    BackgroundColor LightYellow
+    BorderColor DarkSlateGray
+    ArrowColor DarkSlateGray
+}
+
+title High-Level Use Case Diagram - TraceLink
+
+' ==================================================
+' ACTOR HIERARCHY
+' ==================================================
+
+actor "Authenticated User" as AuthUser
+actor "Operational User" as OperationalUser
+actor "SEO Specialist" as SEO
+actor "Digital Marketing User" as DMU
+actor "System Administrator" as Admin
+
+actor "External Website" as Website <<External System>>
+actor "AI Model Provider" as AI <<External System>>
+
+OperationalUser --|> AuthUser
+Admin --|> AuthUser
+
+SEO --|> OperationalUser
+DMU --|> OperationalUser
+
+rectangle "TraceLink" {
+
+    package "URL Batch and Scan Management" {
+
+        usecase "Manage URL Batches" as ManageBatch
+        usecase "Run Batch Scan" as RunScan
+        usecase "Monitor Scan Progress" as MonitorScan
+
+        usecase "Check Cached Results" as CheckCache
+        usecase "Validate URL Status\nand Redirects" as ValidateURL
+        usecase "Retrieve Webpage Content" as RetrieveContent
+        usecase "Analyze Page Structure" as AnalyzeStructure
+        usecase "Evaluate Webpage Content" as EvaluateContent
+
+        RunScan ..> CheckCache : <<include>>
+        RunScan ..> ValidateURL : <<include>>
+
+        RetrieveContent ..> RunScan : <<extend>>
+        AnalyzeStructure ..> RunScan : <<extend>>
+        EvaluateContent ..> RunScan : <<extend>>
+    }
+
+    package "Results and Reporting" {
+
+        usecase "View Scan Results" as ViewResults
+        usecase "Review Flagged URLs" as ReviewFlagged
+        usecase "Generate Report" as GenerateReport
+        usecase "Export Report" as ExportReport
+
+        ReviewFlagged ..> ViewResults : <<extend>>
+        ExportReport ..> GenerateReport : <<include>>
+    }
+
+    package "Account Management" {
+
+        usecase "Manage Own Account" as ManageOwnAccount
+    }
+
+    package "System Administration" {
+
+        usecase "Monitor System Operations" as MonitorSystem
+        usecase "Manage User Accounts" as ManageUsers
+        usecase "Manage Cache" as ManageCache
+        usecase "Review Scan Data Integrity" as ReviewIntegrity
+    }
+}
+
+' ==================================================
+' SHARED AUTHENTICATED USER FUNCTIONS
+' ==================================================
+
+AuthUser -- ViewResults
+AuthUser -- GenerateReport
+AuthUser -- ExportReport
+AuthUser -- ManageOwnAccount
+
+' ==================================================
+' OPERATIONAL USER FUNCTIONS
+' ==================================================
+
+OperationalUser -- ManageBatch
+OperationalUser -- RunScan
+OperationalUser -- MonitorScan
+OperationalUser -- ReviewFlagged
+
+' ==================================================
+' SYSTEM ADMINISTRATOR FUNCTIONS
+' ==================================================
+
+Admin -- MonitorSystem
+Admin -- ManageUsers
+Admin -- ManageCache
+Admin -- ReviewIntegrity
+
+' ==================================================
+' EXTERNAL SYSTEM RELATIONSHIPS
+' ==================================================
+
+Website -- ValidateURL
+Website -- RetrieveContent
+AI -- EvaluateContent
+
+@enduml
