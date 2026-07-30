@@ -1,0 +1,50 @@
+@startuml TraceLink_Container_Diagram
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_LEFT_RIGHT()
+
+title Container Diagram - TraceLink
+
+Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, starts scans, reviews results, performs manual review, and exports SEO reports.")
+Person(systemAdmin, "System Administrator", "Manages users, monitors jobs, reviews logs, and maintains the platform.")
+Person(marketingUser, "Digital Marketing User", "Reviews scan results and reports for SEO and campaign decisions.")
+
+System_Ext(targetWebsites, "External Websites", "Public webpages submitted for validation and analysis.")
+System_Ext(aiProvider, "AI Model Provider", "External AI service used for webpage relevance and content-quality classification.")
+
+System_Boundary(traceLinkBoundary, "TraceLink") {
+
+    Container(webApp, "Web Application", "Web-based UI", "Provides dashboards, file upload, scan control, result review, manual review, and report export.")
+
+    Container(apiApp, "Backend API", "Application Server / REST API", "Handles authentication, file processing, scan orchestration, result retrieval, report generation, and integration with other services.")
+
+    Container(workerService, "Batch Scan Worker", "Background Worker Service", "Processes queued URL batches, validates HTTP status, follows redirects, parses webpage structure, extracts content, and coordinates AI analysis.")
+
+    ContainerDb(mainDb, "TraceLink Database", "Relational Database", "Stores users, uploaded jobs, normalized URLs, scan results, extracted page elements, AI classifications, cache records, and logs.")
+
+    Container(queueService, "Job Queue", "Queue / Message Broker", "Queues scan jobs and background processing tasks.")
+
+    Container(cacheService, "Cache Store", "Cache / Key-Value Store", "Stores reusable scan results, URL fingerprints, content fingerprints, and freshness metadata.")
+}
+
+Rel(seoSpecialist, webApp, "Uses", "HTTPS")
+Rel(systemAdmin, webApp, "Uses", "HTTPS")
+Rel(marketingUser, webApp, "Uses", "HTTPS")
+
+Rel(webApp, apiApp, "Sends user actions and requests", "HTTPS / JSON")
+Rel(apiApp, mainDb, "Reads and writes application data", "SQL")
+Rel(apiApp, queueService, "Queues scan jobs", "AMQP / Queue Protocol")
+Rel(apiApp, cacheService, "Checks and updates reusable cached results", "TCP / Cache Protocol")
+
+Rel(workerService, queueService, "Consumes scan jobs from", "AMQP / Queue Protocol")
+Rel(workerService, mainDb, "Stores scan results and logs in", "SQL")
+Rel(workerService, cacheService, "Reads and writes cache entries", "TCP / Cache Protocol")
+Rel(workerService, targetWebsites, "Requests webpage content from", "HTTPS")
+Rel(workerService, aiProvider, "Sends cleaned webpage text for classification", "HTTPS / API")
+
+Rel(apiApp, workerService, "Coordinates processing status with", "Internal Service Communication")
+
+SHOW_LEGEND()
+
+@enduml

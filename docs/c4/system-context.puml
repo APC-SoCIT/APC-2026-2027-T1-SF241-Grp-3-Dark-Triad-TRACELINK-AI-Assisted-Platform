@@ -1,0 +1,33 @@
+@startuml TraceLink_System_Context
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_LEFT_RIGHT()
+
+title System Context Diagram - TraceLink
+
+Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, starts scans, reviews results, performs manual review, and exports SEO reports.")
+
+Person(systemAdmin, "System Administrator", "Manages users, monitors processing jobs, reviews system logs, and maintains system operations.")
+
+Person(marketingUser, "Digital Marketing User", "Reviews scan results and reports to support SEO, content, backlink, and campaign decisions.")
+
+System(traceLink, "TraceLink", "A cloud-based platform that validates bulk URL datasets, analyzes webpage structures, evaluates content relevance using AI, caches previous results, and generates structured SEO reports.")
+
+System_Ext(targetWebsites, "External Websites", "Public webpages submitted by users for URL validation and webpage-content analysis.")
+
+System_Ext(aiProvider, "AI Model Provider", "External AI service used for structured webpage relevance and content-quality classification.")
+
+Rel(seoSpecialist, traceLink, "Uploads URL batches, starts scans, reviews results, and exports reports", "HTTPS")
+
+Rel(systemAdmin, traceLink, "Manages access, monitors jobs and logs, and reviews integrity alerts", "HTTPS")
+
+Rel(marketingUser, traceLink, "Views and interprets SEO reports", "HTTPS")
+
+Rel(traceLink, targetWebsites, "Sends controlled HTTP requests and retrieves accessible webpage content", "HTTPS")
+
+Rel(traceLink, aiProvider, "Sends prepared webpage text and receives structured classifications", "HTTPS / API")
+
+SHOW_LEGEND()
+
+@enduml
