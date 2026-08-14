@@ -1,0 +1,39 @@
+@startuml TraceLink_UCD_v2
+'UCD v2 with Include and Extends
+left to right direction
+actor "SEO Specialist" as SEO
+actor "System Administrator" as Admin
+rectangle "TraceLink System" {
+    usecase "Manage Account" as UC1
+    usecase "Upload URL File" as UC2
+    usecase "Initiate Batch Scan" as UC3
+    usecase "Verify Stored Data Integrity" as UC4
+
+    ' include Sub Use Cases
+    usecase "Extract and Parse URLs" as I1
+    usecase "Check Cached Results" as I2
+    usecase "Validate HTTP Status" as I3
+    usecase "Parse DOM & Detect Interactions" as I4
+    usecase "Evaluate Content via AI" as I5
+    ' extends Sub Use Cases
+    usecase "Refresh Expired Cache Data" as E1
+    usecase "Track Redirects and Access Errors" as E2
+    usecase "Flag Low-Quality / Spam Pages" as E3
+}
+SEO --> UC1
+SEO --> UC2
+SEO --> UC3
+Admin --> UC1
+Admin --> UC4
+
+'includes
+UC2 ..> I1 : <<include>>
+UC3 ..> I2 : <<include>>
+UC3 ..> I3 : <<include>>
+UC3 ..> I4 : <<include>>
+UC3 ..> I5 : <<include>>
+'extends
+UC3 <.. E1 : <<extends>>
+UC3 <.. E2 : <<extends>>
+UC3 <.. E3 : <<extends>>
+@enduml
