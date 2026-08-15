@@ -6,27 +6,23 @@ LAYOUT_LEFT_RIGHT()
 
 title System Context Diagram - TraceLink
 
-Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, starts scans, reviews results, performs manual review, and exports SEO reports.")
+Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, runs scans, reviews results, and uses SEO analysis reports.")
 
-Person(systemAdmin, "System Administrator", "Manages users, monitors processing jobs, reviews system logs, and maintains system operations.")
+Person(systemAdmin, "System Administrator", "Manages users, monitors operations and logs, and maintains platform reliability.")
 
-Person(marketingUser, "Digital Marketing User", "Reviews scan results and reports to support SEO, content, backlink, and campaign decisions.")
+System(traceLink, "TraceLink", "Automates bulk URL validation, webpage analysis, AI-assisted content evaluation, and result reporting.")
 
-System(traceLink, "TraceLink", "A cloud-based platform that validates bulk URL datasets, analyzes webpage structures, evaluates content relevance using AI, caches previous results, and generates structured SEO reports.")
+System_Ext(externalWebsites, "External Websites", "Public webpages accessed by TraceLink for URL validation and content analysis.")
 
-System_Ext(targetWebsites, "External Websites", "Public webpages submitted by users for URL validation and webpage-content analysis.")
+System_Ext(aiService, "AI Service", "Evaluates webpage content for relevance and quality.")
 
-System_Ext(aiProvider, "AI Model Provider", "External AI service used for structured webpage relevance and content-quality classification.")
+Rel(seoSpecialist, traceLink, "Uploads batches, runs scans, and reviews results", "HTTPS")
 
-Rel(seoSpecialist, traceLink, "Uploads URL batches, starts scans, reviews results, and exports reports", "HTTPS")
+Rel(systemAdmin, traceLink, "Manages users and monitors system operations", "HTTPS")
 
-Rel(systemAdmin, traceLink, "Manages access, monitors jobs and logs, and reviews integrity alerts", "HTTPS")
+Rel(traceLink, externalWebsites, "Validates URLs and retrieves webpage content", "HTTPS")
 
-Rel(marketingUser, traceLink, "Views and interprets SEO reports", "HTTPS")
-
-Rel(traceLink, targetWebsites, "Sends controlled HTTP requests and retrieves accessible webpage content", "HTTPS")
-
-Rel(traceLink, aiProvider, "Sends prepared webpage text and receives structured classifications", "HTTPS / API")
+Rel(traceLink, aiService, "Requests content evaluation", "HTTPS / API")
 
 SHOW_LEGEND()
 
