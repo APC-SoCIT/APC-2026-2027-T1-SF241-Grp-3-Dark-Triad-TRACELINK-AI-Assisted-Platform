@@ -1,0 +1,98 @@
+@startuml
+left to right direction
+
+skinparam actor {
+  BackgroundColor<<specialist>> lightblue
+  BackgroundColor<<administrator>> pink
+}
+skinparam component {
+  BackgroundColor<<service>> grey
+  BackgroundColor<<integrity>> lightgrey
+  BackgroundColor<<orchestrator>> grey
+}
+skinparam database {
+  BackgroundColor<<database>> darkgrey
+}
+skinparam interface {
+  ArrowColor black
+}
+skinparam package {
+  BorderColor black
+}
+
+title TraceLink System Component Diagram
+
+package "TraceLink System" {
+  
+  interface "ParsingInterface" as PI
+  interface "AnalysisInterface" as AI
+  interface "OrchestrationInterface" as OI
+  interface "WebInteractionInterface" as WI
+  interface "Cache_ManagementInterface" as CM
+  interface "PersistenceInterface" as PS
+  interface "StorageAdminInterface" as SA
+
+  component [Upload_Ingestion] <<component>>
+
+  component [Extraction_Service] <<component>> {
+    component "Extract and Parse URLs" <<service>> as ep
+    component "Parse DOM" <<service>> as pd
+  }
+
+  component [Analysis_Service] <<component>> {
+    component "Evaluate Content via AI" <<service>> as ec
+    component "Flag Low-Quality / Spam Pages" <<service>> as fl
+  }
+
+  component [Batch_Orchestrator] <<component>> {
+    component "Initiate Batch Scan" <<orchestrator>> as ibs
+  }
+
+  component [Web_&_Cache_Service] <<component>> {
+    component "Validate HTTP Status" <<service>> as vs
+    component "Track Redirects" <<service>> as tr
+    component "Check Cached Results" <<service>> as cr
+    component "Refresh Expired Cache Data" <<service>> as re
+  }
+
+  component [Account_Management] <<component>> {
+    component "Manage Account" <<service>> as ma
+  }
+
+  component [Data_Integrity_Module] <<component>> {
+    component "Verify Stored Data Integrity" <<integrity>> as vi
+  }
+
+  database [Database] <<database>>
+
+  [Extraction_Service] -- PI
+  [Analysis_Service] -- AI
+  [Batch_Orchestrator] -- OI
+  [Web_&_Cache_Service] -- WI
+  [Web_&_Cache_Service] -- CM
+  [Database] -- PS
+  [Database] -- SA
+
+  [Upload_Ingestion] ..> PI : use
+  [Upload_Ingestion] ..> OI : register
+  [Batch_Orchestrator] ..> PI : use
+  [Batch_Orchestrator] ..> AI : use
+  [Batch_Orchestrator] ..> WI : use
+  [Batch_Orchestrator] ..> CM : use
+  [Data_Integrity_Module] ..> SA : use
+  [Extraction_Service] ..> PS : use
+  [Analysis_Service] ..> PS : use
+  [Web_&_Cache_Service] ..> PS : use
+  [Account_Management] ..> PS : use
+}
+
+actor "SEO Specialist" <<specialist>>
+actor "System Administrator" <<administrator>>
+
+"SEO Specialist" --> [Upload_Ingestion]
+"SEO Specialist" --> [Batch_Orchestrator]
+"SEO Specialist" --> [Account_Management]
+"System Administrator" --> [Data_Integrity_Module]
+"System Administrator" --> [Account_Management]
+
+@enduml
