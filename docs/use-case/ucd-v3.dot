@@ -1,0 +1,50 @@
+//UCD using Graphviz
+digraph TraceLink-UCD-v3 {
+    rankdir=LR;
+    node [shape=ellipse, style=filled, fillcolor=white, fontname="Arial"];
+    node [shape=box, style="filled,rounded", fillcolor=lightgray];
+    SEO [label="👤 SEO Specialist"];
+    Admin [label="👤 System Administrator"];
+    node [shape=ellipse, style=filled, fillcolor=white];
+    UC1 [label = "Manage Account"];
+    UC2 [label = "Upload Bulk URL Lists"];
+    UC3 [label = "Initiate Batch Scan"];
+    UC4 [label = "Manage Cache Operations"];
+    UC5 [label = "Check Stored Data Integrity"];
+    UC6 [label = "Monitor Scan Progress"];
+    UC7 [label = "Review Dashboard Results"];
+    UC8 [label = "Review System and Activity Logs"];
+    UC9 [label = "Monitor System Operations and AI Usage"];
+    I1 [label = "Extract and Normalize URLs"];
+    I2 [label = "Detect Duplicate URLs"];
+    I3 [label = "Validate Technical URLs"];
+    I4 [label = "Analyze Webpage Content"];
+    I5 [label = "Run AI Content Evaluation"];
+    I6 [label = "Reuse Fresh Cached Results"];
+    I7 [label = "Refresh Stale Cached Data"];
+    I8 [label = "Search & Filter Scan Results"];
+    E1 [label = "Perform Manual Review & Override Flags"];
+    E2 [label = "Export Processed Results"];
+
+    SEO -> UC1
+    SEO -> UC2
+    SEO -> UC3
+    SEO -> UC4
+    Admin -> UC1
+    Admin -> UC5
+    SEO -> UC6
+    SEO -> UC7
+    Admin -> UC8
+    Admin -> UC9
+
+    UC2 -> I1 [style=dashed, label="<<include>>"];
+    UC2 -> I2 [style=dashed, label="<<include>>"];
+    UC3 -> I3 [style=dashed, label="<<include>>"];
+    UC3 -> I4 [style=dashed, label="<<include>>"];
+    UC3 -> I5 [style=dashed, label="<<include>>"];
+    UC4 -> I6 [style=dashed, label="<<include>>"];
+    UC4 -> E1 [style=dashed, label="<<extend>>"];
+    UC7 -> I7 [style=dashed, label="<<include>>"];
+    UC7 -> E2 [style=dashed, label="<<extend>>"];
+    UC7 -> I8 [style=dashed, label="<<include>>"];
+}
