@@ -6,23 +6,27 @@ LAYOUT_LEFT_RIGHT()
 
 title System Context Diagram - TraceLink
 
-Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, runs scans, reviews results, and uses SEO analysis reports.")
+Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, initiates scans, monitors progress, reviews results, performs manual review, and exports processed results.")
 
-Person(systemAdmin, "System Administrator", "Manages users, monitors operations and logs, and maintains platform reliability.")
+Person(systemAdmin, "System Administrator", "Manages user accounts, checks data integrity, reviews logs, and monitors system operations and AI usage.")
 
-System(traceLink, "TraceLink", "Automates bulk URL validation, webpage analysis, AI-assisted content evaluation, and result reporting.")
+System(traceLink, "TraceLink", "Automates bulk URL validation, webpage structure analysis, content fingerprinting, AI-assisted content evaluation, cache management, result review, and reporting.")
 
-System_Ext(externalWebsites, "External Websites", "Public webpages accessed by TraceLink for URL validation and content analysis.")
+System_Ext(targetWebsites, "Target Websites", "External webpages accessed for URL validation and webpage-content analysis.")
 
-System_Ext(aiService, "AI Service", "Evaluates webpage content for relevance and quality.")
+System_Ext(aiService, "AI Service", "External AI provider used to evaluate accessible webpage content for relevance, quality, and spam-like indicators.")
 
-Rel(seoSpecialist, traceLink, "Uploads batches, runs scans, and reviews results", "HTTPS")
+' Layout helper
+seoSpecialist -[hidden]down-> systemAdmin
 
-Rel(systemAdmin, traceLink, "Manages users and monitors system operations", "HTTPS")
+' Two-way relationships
+seoSpecialist <--> traceLink : Uploads URL batches and initiates scans;\nreceives progress, analysis results,\nreview information, and exports\n[HTTPS]
 
-Rel(traceLink, externalWebsites, "Validates URLs and retrieves webpage content", "HTTPS")
+systemAdmin <--> traceLink : Manages users and monitors the platform;\nreceives integrity results, logs,\nalerts, and operational information\n[HTTPS]
 
-Rel(traceLink, aiService, "Requests content evaluation", "HTTPS / API")
+traceLink <--> targetWebsites : Sends validation/content requests;\nreceives HTTP responses, redirects,\nerrors, and accessible webpage content\n[HTTPS]
+
+traceLink <--> aiService : Sends prepared webpage content and criteria;\nreceives relevance, quality,\nspam-like indicators, and explanations\n[HTTPS / API]
 
 SHOW_LEGEND()
 
