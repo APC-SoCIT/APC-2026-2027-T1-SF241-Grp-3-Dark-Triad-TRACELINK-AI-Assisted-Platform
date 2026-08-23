@@ -1,24 +1,24 @@
 @startuml TraceLink_Container_Diagram
-!include http://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 LAYOUT_WITH_LEGEND()
 LAYOUT_LEFT_RIGHT()
 
 title Container Diagram - TraceLink
 
-Person(seo, "SEO Specialist", "Uploads and reviews URL scans")
-Person(admin, "System Administrator", "Monitors system integrity")
+Person(seo, "SEO Specialist", "Manages their account, uploads URL lists, initiates scans, reviews and overrides results, and manages cached data")
+Person(admin, "System Administrator", "Manages accounts, checks stored data integrity, and reviews system/activity logs and AI usage")
 
 System_Boundary(tracelink, "TraceLink") {
-    Container(webapp, "Web Application", "React (SPA)", "Lets users upload URL datasets, set evaluation criteria, view dashboards, and export reports")
-    Container(api, "API Application", "", "Validates uploads, cleans and normalizes URLs, detects duplicates, and orchestrates processing jobs")
-    ContainerQueue(queue, "Task Queue", "", "Holds validation jobs so URLs can be processed asynchronously instead of one at a time")
-    Container(worker, "Worker Service", "", "Validates URL status, analyzes webpage structure, and runs AI-assisted content evaluation")
-    ContainerDb(db, "Database", "", "Stores jobs, normalized URLs, validation results, extracted page elements, AI classifications, and cache/fingerprint records")
+    Container(webapp, "Web Application", "React + Vite + Tailwind (SPA)", "Lets users manage their account, upload URL datasets, set evaluation criteria, view dashboards, search/filter/override results, manage cache, and export reports")
+    Container(api, "API Application", "Express (Node.js) REST API", "Handles account management, validates uploads, cleans/normalizes/deduplicates URLs, orchestrates processing jobs, serves cached results, applies manual overrides, and exposes logs and AI usage data")
+    ContainerQueue(queue, "Task Queue", "Redis (BullMQ backend)", "Holds validation jobs so URLs can be processed asynchronously instead of one at a time")
+    Container(worker, "Worker Service", "Node.js worker (BullMQ)", "Validates URL status, analyzes webpage structure, and runs AI-assisted content evaluation")
+    ContainerDb(db, "Database", "PostgreSQL via Prisma", "Stores accounts, jobs, normalized URLs, validation results, extracted page elements, AI classifications, cache freshness data, activity/system logs, and AI usage records")
 }
 
 System_Ext(websites, "Target Websites", "The external URLs being validated")
-System_Ext(ai, "AI Model Provider", "e.g. Gemini API - performs content relevance/quality classification")
+System_Ext(ai, "Google Gemini API", "Performs content relevance/quality classification")
 
 Rel(seo, webapp, "Uses", "HTTPS")
 Rel(admin, webapp, "Uses", "HTTPS")
