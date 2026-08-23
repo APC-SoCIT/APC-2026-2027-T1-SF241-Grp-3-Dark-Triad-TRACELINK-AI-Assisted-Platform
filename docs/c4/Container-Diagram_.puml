@@ -1,0 +1,63 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+' Force horizontal layout
+LAYOUT_LEFT_RIGHT()
+
+' Layout optimizations for cleaner arrow routing
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 90
+
+title Component Diagram for TraceLink - Worker Service
+
+' --- External Systems and Adjacent Containers ---
+ContainerQueue(taskQueue, "Task Queue", "Message Broker", "Provides queued URL batch scanning jobs.")
+ContainerDb(database, "TraceLink Database", "PostgreSQL", "Stores users, batches, URLs, scan results,\nanalysis results, AI evaluations, cache records, and logs.")
+
+System_Ext(targetWebsites, "Target Websites", "External websites to be validated and analyzed.")
+System_Ext(aiService, "AI Service", "External AI Provider used for content evaluation.")
+
+' --- Zooming into the Worker Service Container ---
+Container_Boundary(workerService, "Worker Service") {
+    
+    Component(jobProcessor, "Job Processor", "Task Consumer", "Consumes jobs from the queue and orchestrates the URL scanning workflow.")
+    
+    Component(cacheManager, "Cache Management Component", "Cache Logic", "Checks cached results and freshness,\nand determines whether revalidation is required.")
+    
+    Component(httpValidator, "HTTP Validation Component", "Network Logic", "Validates HTTP status, tracks redirects,\nand handles timeouts or access errors.")
+    
+    Component(webRetriever, "Web Content Retrieval Component", "HTTP Content Retriever", "Fetches HTML content from target URLs after successful validation.")
+    
+    Component(pageAnalyzer, "Page Structure Analysis Component", "DOM Parser", "Parses DOM to extract titles, headings, links, forms, and core content.")
+    
+    Component(fingerprint, "Content Fingerprint Component", "Hashing Engine", "Generates content fingerprints for duplicate-content detection and cache comparison.")
+    
+    Component(aiEval, "AI Evaluation Component", "Integration Client", "Evaluates accessible webpage content for relevance,\nquality, and spam-like indicators using the external AI service.")
+    
+    Component(resultPersister, "Result Persistence Component", "Data Access", "Persists technical, structural, AI, fingerprint,\nand processing results.")
+}
+
+' --- Relationships ---
+
+' Inbound to Worker
+Rel(taskQueue, jobProcessor, "Delivers scan jobs to", "Async")
+
+' Internal Orchestration Dependencies (Numbered to show logical pipeline flow)
+Rel(jobProcessor, cacheManager, "1. Checks cache status via")
+Rel(jobProcessor, httpValidator, "2. Initiates network checks via")
+Rel(jobProcessor, webRetriever, "3. Requests page fetching via")
+Rel(jobProcessor, pageAnalyzer, "4. Triggers DOM parsing via")
+Rel(jobProcessor, fingerprint, "5. Provides extracted content\nfor fingerprinting via")
+Rel(jobProcessor, aiEval, "6. Requests quality & relevance\nassessment via")
+Rel(jobProcessor, resultPersister, "7. Saves combined execution\noutput via")
+
+' Outbound from Worker to External Systems/Containers
+Rel(httpValidator, targetWebsites, "Validates HTTP status against", "HTTPS")
+Rel(webRetriever, targetWebsites, "Downloads HTML from", "HTTPS")
+Rel(aiEval, aiService, "Sends structured data\nfor evaluation to", "API")
+
+Rel(cacheManager, database, "Reads/writes cached scan results\nand freshness metadata", "SQL/TCP")
+Rel(resultPersister, database, "Writes processing results to", "SQL/TCP")
+
+@enduml
