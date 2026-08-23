@@ -1,0 +1,27 @@
+digraph TraceLink-UCD-v3 {
+    rankdir=LR;
+    node [shape=ellipse, style=filled, fillcolor=white, fontname="Arial"];
+    node [shape=box, style="filled,rounded", fillcolor=lightgray];
+    SEO [label="👤 SEO Specialist"];
+    Admin [label="👤 System Administrator"];
+    node [shape=ellipse, style=filled, fillcolor=white];
+    UC1 [label = "Manage Account"];
+    UC2 [label = "Upload Bulk URL Lists"];
+    UC3 [label = "Initiate Batch Scan"];
+    UC4 [label = "Manage Cache Operations"];
+    UC5 [label = "Check Stored Data Integrity"];
+    UC6 [label = "Monitor Scan Progress"];
+    UC7 [label = "Review Dashboard Results"];
+    UC8 [label = "Review System and Activity Logs"];
+    UC9 [label = "Monitor System Operations and AI Usage"];
+    SEO -> UC1
+    SEO -> UC2
+    SEO -> UC3
+    SEO -> UC4
+    Admin -> UC1
+    Admin -> UC5
+    SEO -> UC6
+    SEO -> UC7
+    Admin -> UC8
+    Admin -> UC9
+}
