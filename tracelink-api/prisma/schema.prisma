@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model USER {
+  USR_ID           Int      @id @default(autoincrement())
+  USR_FirstName    String
+  USR_LastName     String
+  USR_Email        String   @unique
+  USR_PasswordHash String
+  USR_Role         String
+  USR_Status       String
+  USR_CreatedAt    DateTime @default(now())
+  USR_UpdatedAt    DateTime @updatedAt
+
+  logs      SYSTEM_LOG[]
+  URL_BATCH URL_BATCH[]
+}
+
+model SYSTEM_LOG {
+  LOG_ID        Int      @id @default(autoincrement())
+  LOG_Level     String
+  LOG_EventType String
+  LOG_Message   String
+  LOG_CreatedAt DateTime @default(now())
+
+  USER_USR_ID Int
+  user        USER @relation(fields: [USER_USR_ID], references: [USR_ID])
+}
+
+model URL_BATCH {
+  BAT_ID         Int      @id @default(autoincrement())
+  BAT_FileName   String
+  BAT_FileType   String
+  BAT_TotalURLs  Int
+  BAT_Status     String
+  BAT_UploadedAt DateTime @default(now())
+
+  USER_USR_ID Int
+  user        USER @relation(fields: [USER_USR_ID], references: [USR_ID])
+
+  urls URL[]
+  jobs SCAN_JOB[]
+}
+
+model URL {
+  URL_ID          Int      @id @default(autoincrement())
+  URL_Original    String
+  URL_Normalized  String
+  URL_IsDuplicate Boolean  @default(false)
+  URL_CreatedAt   DateTime @default(now())
+
+  URL_BATCH_BAT_ID Int
+  batch            URL_BATCH @relation(fields: [URL_BATCH_BAT_ID], references: [BAT_ID])
+
+  DUPLICATE_GROUP_DPG_ID Int?
+  duplicateGroup         DUPLICATE_GROUP? @relation(fields: [DUPLICATE_GROUP_DPG_ID], references: [DPG_ID])
+
+  results SCAN_RESULT[]
+}
+
+model DUPLICATE_GROUP {
+  DPG_ID          Int      @id @default(autoincrement())
+  DPG_Type        String
+  DPG_Fingerprint String
+  DPG_CreatedAt   DateTime @default(now())
+
+  urls URL[]
+}
+
+model SCAN_JOB {
+  SCN_ID            Int       @id @default(autoincrement())
+  SCN_Status        String
+  SCN_StartedAt     DateTime?
+  SCN_CompletedAt   DateTime?
+  SCN_TotalURLs     Int
+  SCN_ProcessedURLs Int       @default(0)
+  SCN_FailedURLs    Int       @default(0)
+
+  URL_BATCH_BAT_ID Int
+  batch            URL_BATCH @relation(fields: [URL_BATCH_BAT_ID], references: [BAT_ID])
+
+  results SCAN_RESULT[]
+}
+
+model SCAN_RESULT {
+  RES_ID                   Int       @id @default(autoincrement())
+  RES_HTTPStatus           Int?
+  RES_StatusLabel          String
+  RES_FinalURL             String?
+  RES_RedirectCount        Int       @default(0)
+  RES_ResponseTimeMs       Int?
+  RES_ErrorType            String?
+  RES_ManualReviewRequired Boolean   @default(false)
+  RES_CheckedAt            DateTime?
+
+  SCAN_JOB_SCN_ID Int
+  job             SCAN_JOB @relation(fields: [SCAN_JOB_SCN_ID], references: [SCN_ID])
+
+  URL_URL_ID Int
+  url        URL @relation(fields: [URL_URL_ID], references: [URL_ID])
+
+  pageAnalysis PAGE_ANALYSIS?
+  aiEvaluation AI_EVALUATION?
+  cacheRecords CACHE_RECORD[]
+}
+
+model PAGE_ANALYSIS {
+  PGA_ID                Int      @id @default(autoincrement())
+  PGA_Title             String?
+  PGA_MetaDescription   String?
+  PGA_Headings          String?
+  PGA_InternalLinkCount Int
+  PGA_ExternalLinkCount Int
+  PGA_FormCount         Int
+  PGA_HasCommentSection Boolean
+  PGA_HasUserInput      Boolean
+  PGA_ContentPreview    String?
+  PGA_AnalyzedAt        DateTime
+
+  SCAN_RESULT_RES_ID Int         @unique
+  result             SCAN_RESULT @relation(fields: [SCAN_RESULT_RES_ID], references: [RES_ID])
+}
+
+model AI_EVALUATION {
+  AIE_ID                Int      @id @default(autoincrement())
+  AIE_RelevanceLabel    String
+  AIE_RelevanceScore    Decimal? @db.Decimal(5, 2)
+  AIE_QualityLabel      String?
+  AIE_SpamLike          Boolean
+  AIE_Explanation       String?
+  AIE_RecommendedAction String?
+  AIE_EvaluatedAt       DateTime
+
+  SCAN_RESULT_RES_ID Int         @unique
+  result             SCAN_RESULT @relation(fields: [SCAN_RESULT_RES_ID], references: [RES_ID])
+}
+
+model CACHE_RECORD {
+  CAC_ID                 Int      @id @default(autoincrement())
+  CAC_URLFingerprint     String
+  CAC_ContentFingerprint String?
+  CAC_CachedAt           DateTime @default(now())
+  CAC_ExpiresAt          DateTime
+  CAC_IsValid            Boolean  @default(true)
+
+  SCAN_RESULT_RES_ID Int
+  result             SCAN_RESULT @relation(fields: [SCAN_RESULT_RES_ID], references: [RES_ID])
+}
