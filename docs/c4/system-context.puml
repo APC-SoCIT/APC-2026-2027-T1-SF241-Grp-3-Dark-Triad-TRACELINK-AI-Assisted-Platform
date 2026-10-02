@@ -2,31 +2,40 @@
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
-LAYOUT_LEFT_RIGHT()
+LAYOUT_TOP_DOWN()
 
 title System Context Diagram - TraceLink
 
-Person(seoSpecialist, "SEO Specialist", "Uploads URL datasets, initiates scans, monitors progress, reviews results, performs manual review, and exports processed results.")
+Person(seoSpecialist, "SEO Specialist", "Performs URL validation and webpage-content review for SEO work.")
+Person(workspaceOwner, "Workspace Owner / Team Administrator", "Coordinates shared TraceLink work and manages workspace access.")
+Person(systemAdmin, "System Administrator", "Manages platform-wide access, configuration, and administrative controls.")
+Person(supportStaff, "Operations / Support Staff", "Supports users and investigates authorized operational issues.")
+Person(platformOperator, "Project Team / Platform Operator", "Operates, monitors, and improves the TraceLink service.")
 
-Person(systemAdmin, "System Administrator", "Manages user accounts, checks data integrity, reviews logs, and monitors system operations and AI usage.")
+System(tracelink, "TraceLink", "Cloud-based platform for bounded SEO URL validation and web content analysis.")
 
-System(traceLink, "TraceLink", "Automates bulk URL validation, webpage structure analysis, content fingerprinting, AI-assisted content evaluation, cache management, result review, and reporting.")
+System_Ext(targetWebsites, "Target Websites", "External webpages processed for technical validation and accessible content retrieval.")
+System_Ext(aiService, "External AI Service", "Provides AI-assisted evaluation of prepared webpage content.")
 
-System_Ext(targetWebsites, "Target Websites", "External webpages accessed for URL validation and webpage-content analysis.")
+BiRel(seoSpecialist, tracelink, "Submits URL batches and review actions;\nreceives scan results and reports", "HTTPS")
+BiRel(workspaceOwner, tracelink, "Manages shared work and permissions;\nreceives workspace and scan information", "HTTPS")
+BiRel(systemAdmin, tracelink, "Performs administrative actions;\nreceives platform and integrity information", "HTTPS")
+BiRel(supportStaff, tracelink, "Performs support and diagnostic actions;\nreceives ticket and failure information", "HTTPS")
+BiRel(platformOperator, tracelink, "Performs operational actions;\nreceives health and performance information", "HTTPS")
 
-System_Ext(aiService, "AI Service", "External AI provider used to evaluate accessible webpage content for relevance, quality, and spam-like indicators.")
+BiRel(tracelink, targetWebsites, "Sends controlled requests;\nreceives responses and accessible content", "HTTP/HTTPS")
+BiRel(tracelink, aiService, "Sends prepared content and criteria;\nreceives structured evaluation", "HTTPS / API")
 
-' Layout helper
-seoSpecialist -[hidden]down-> systemAdmin
+' Compact placement
+Lay_R(seoSpecialist, workspaceOwner)
+Lay_R(workspaceOwner, systemAdmin)
+Lay_R(systemAdmin, supportStaff)
+Lay_R(supportStaff, platformOperator)
 
-' Two-way relationships
-seoSpecialist <--> traceLink : Uploads URL batches and initiates scans;\nreceives progress, analysis results,\nreview information, and exports\n[HTTPS]
+Lay_D(systemAdmin, tracelink)
 
-systemAdmin <--> traceLink : Manages users and monitors the platform;\nreceives integrity results, logs,\nalerts, and operational information\n[HTTPS]
-
-traceLink <--> targetWebsites : Sends validation/content requests;\nreceives HTTP responses, redirects,\nerrors, and accessible webpage content\n[HTTPS]
-
-traceLink <--> aiService : Sends prepared webpage content and criteria;\nreceives relevance, quality,\nspam-like indicators, and explanations\n[HTTPS / API]
+Lay_R(targetWebsites, aiService)
+Lay_D(tracelink, targetWebsites)
 
 SHOW_LEGEND()
 
