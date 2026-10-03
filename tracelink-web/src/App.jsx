@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import Sidebar from "./components/Sidebar";
 import TopBar from "./components/TopBar";
-import UploadURL from "./components/UploadURL";
 
 import Overview from "./pages/Overview";
 import ScanResults from "./pages/ScanResults";
@@ -11,6 +10,7 @@ import Analytics from "./pages/Analytics";
 import ManualReview from "./pages/ManualReview";
 import Workspace from "./pages/Workspace";
 import SupportQueue from "./pages/SupportQueue";
+import NewScan from "./pages/NewScan";
 
 import {
   createBatch,
@@ -100,26 +100,10 @@ function App() {
 
       case "New Scan":
         return (
-          <div className="content-wrap">
-            <section className="page-heading">
-              <div>
-                <span className="section-kicker">
-                  URL VALIDATION
-                </span>
-
-                <h1>New Scan</h1>
-
-                <p>
-                  Upload a CSV file containing URLs to initiate a batch scan.
-                </p>
-              </div>
-            </section>
-
-            <UploadURL
-              onStartScan={handleStartScan}
-              isScanning={isScanning}
-            />
-          </div>
+          <NewScan 
+            onStartScan={handleStartScan}
+            isScanning={isScanning}
+          />
         );
 
       case "Scan Results":

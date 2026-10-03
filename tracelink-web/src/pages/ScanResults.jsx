@@ -291,22 +291,22 @@ function ScanResults({ jobId, onJobChange }) {
 
             <div className="scan-information">
               <div>
-                <span>Job ID</span>
+                <span>Job ID: </span>
                 <strong>{job.jobId ?? "—"}</strong>
               </div>
 
               <div>
-                <span>Batch ID</span>
+                <span>Batch ID: </span>
                 <strong>{job.batchId ?? "—"}</strong>
               </div>
 
               <div>
-                <span>File</span>
+                <span>File: </span>
                 <strong>{job.fileName ?? "—"}</strong>
               </div>
 
               <div>
-                <span>Processed</span>
+                <span>Processed: </span>
                 <strong>
                   {results.length} / {job.totalUrls ?? 0}
                 </strong>
