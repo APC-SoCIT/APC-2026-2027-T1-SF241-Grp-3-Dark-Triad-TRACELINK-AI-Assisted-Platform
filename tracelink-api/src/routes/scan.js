@@ -4,10 +4,6 @@ const { scanQueue } = require("../queue/queue");
 
 const router = express.Router();
 
-// POST /api/batches/:batchId/scan
-// Creates a SCAN_JOB for a previously-uploaded batch, and publishes one
-// task per URL onto the queue. Does NOT do any validation itself —
-// that's the Worker Service's job, which we'll build next.
 router.post("/batches/:batchId/scan", async (req, res) => {
   const batchId = Number(req.params.batchId);
 
