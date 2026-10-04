@@ -1,0 +1,554 @@
+digraph TraceLink_TO_BE {
+
+    // ============================================================
+    // GLOBAL SETTINGS
+    // ============================================================
+
+    graph [
+        label="TO-BE DIAGRAM: PROPOSED TRACELINK WORKFLOW"
+        labelloc="t"
+        labeljust="c"
+
+        fontsize=24
+        fontname="Arial Bold"
+
+        bgcolor="white"
+
+        rankdir=TB
+        newrank=true
+        compound=true
+
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.85
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="rounded,filled"
+
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=10
+
+        margin="0.18,0.12"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+
+        fontname="Arial"
+        fontsize=9
+
+        arrowsize=0.75
+    ];
+
+
+    // ============================================================
+    // EXTERNAL HUMAN ACTORS
+    // ============================================================
+
+    seo_actor [
+        label="SEO Specialist\n(End User)"
+        fillcolor="#F2F2F2"
+        color="#555555"
+        width=2.0
+    ];
+
+    workspace_actor [
+        label="Workspace Owner /\nTeam Administrator"
+        fillcolor="#F2F2F2"
+        color="#555555"
+        width=2.1
+    ];
+
+    admin_actor [
+        label="System Administrator"
+        fillcolor="#F2F2F2"
+        color="#555555"
+        width=2.0
+    ];
+
+    support_actor [
+        label="Operations /\nSupport Staff"
+        fillcolor="#F2F2F2"
+        color="#555555"
+        width=2.0
+    ];
+
+    platform_actor [
+        label="Project Team /\nPlatform Operator"
+        fillcolor="#F2F2F2"
+        color="#555555"
+        width=2.0
+    ];
+
+    {
+        rank=same;
+        seo_actor;
+        workspace_actor;
+        admin_actor;
+        support_actor;
+        platform_actor;
+    }
+
+    seo_actor -> workspace_actor [
+        style=invis
+        weight=50
+    ];
+
+    workspace_actor -> admin_actor [
+        style=invis
+        weight=50
+    ];
+
+    admin_actor -> support_actor [
+        style=invis
+        weight=50
+    ];
+
+    support_actor -> platform_actor [
+        style=invis
+        weight=50
+    ];
+
+
+    // ============================================================
+    // TRACELINK SYSTEM SCOPE
+    // ============================================================
+
+    subgraph cluster_tracelink {
+
+        label="TRACELINK SYSTEM SCOPE\n(In Scope / TraceLink-Controlled)"
+        labelloc="t"
+        labeljust="l"
+
+        fontsize=16
+        fontname="Arial Bold"
+
+        color="#1F3557"
+        penwidth=2.0
+        style="dashed,rounded"
+
+        margin=24;
+
+
+        // ========================================================
+        // MODULE 1
+        // ========================================================
+
+        m1 [
+            label="1. USER ACCESS AND\nACCOUNT MANAGEMENT\n\nRegistration • Login • Authorization\nAccount Management"
+            width=2.8
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 2
+        // ========================================================
+
+        m2 [
+            label="2. WORKSPACE AND\nMEMBER MANAGEMENT\n\nWorkspace Access • Members\nRoles • Permissions"
+            width=2.8
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 3
+        // ========================================================
+
+        m3 [
+            label="3. URL BATCH UPLOAD\nAND PREPARATION\n\nUpload • Validate • Normalize\nInvalid URLs • Duplicates"
+            width=2.8
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 4
+        // ========================================================
+
+        m4 [
+            label="4. BATCH SCAN AND\nTECHNICAL URL VALIDATION\n\nQueue • Safe Request Validation\nHTTP Status • Redirects • Errors"
+            width=2.9
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 5
+        // ========================================================
+
+        m5 [
+            label="5. WEBPAGE RETRIEVAL AND\nAI-ASSISTED ANALYSIS\n\nContent Retrieval • Structure Analysis\nAI-Assisted Evaluation"
+            width=3.0
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MAIN USER WORKFLOW
+        // ========================================================
+
+        {
+            rank=same;
+            m1;
+            m2;
+            m3;
+            m4;
+            m5;
+        }
+
+        m1 -> m2 [
+            xlabel="Workspace access"
+            penwidth=1.4
+        ];
+
+        m2 -> m3 [
+            xlabel="Begin URL work"
+            penwidth=1.4
+        ];
+
+        m3 -> m4 [
+            xlabel="Prepared batch"
+            penwidth=1.4
+        ];
+
+        m4 -> m5 [
+            xlabel="Accessible URL"
+            penwidth=1.4
+        ];
+
+
+        // ========================================================
+        // MODULE 6
+        // ========================================================
+
+        m6 [
+            label="6. SCAN MONITORING AND\nCACHE HANDLING\n\nProgress Monitoring • Cache Lookup\nFresh / Stale Result Handling"
+            width=3.3
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 7
+        // ========================================================
+
+        m7 [
+            label="7. SCAN RESULT REVIEW\nAND REPORTING\n\nSearch / Filter • Manual Review\nOverride • Export"
+            width=3.3
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // MODULE 8
+        // ========================================================
+
+        m8 [
+            label="8. SYSTEM OPERATIONS, SUPPORT,\nAND SECURITY ADMINISTRATION\n\nSupport • Platform Monitoring\nAccess Control • Logs • Data Integrity"
+            width=3.8
+            height=1.35
+        ];
+
+
+        // ========================================================
+        // SECOND ROW
+        // ========================================================
+
+        {
+            rank=same;
+            m6;
+            m7;
+            m8;
+        }
+
+        m6 -> m7 [
+            xlabel="Completed scan results"
+            penwidth=1.4
+        ];
+
+        m7 -> m8 [
+            style=invis
+            weight=50
+        ];
+
+
+        // ========================================================
+        // SECOND-ROW POSITIONING
+        // ========================================================
+
+        m2 -> m6 [
+            style=invis
+            weight=40
+        ];
+
+        m3 -> m7 [
+            style=invis
+            weight=40
+        ];
+
+        m5 -> m8 [
+            style=invis
+            weight=40
+        ];
+
+
+        // ========================================================
+        // MONITORING / CACHE SUPPORT
+        // ========================================================
+
+        m4 -> m6 [
+            style=dashed
+            color="#777777"
+            constraint=false
+            xlabel="Scan progress"
+        ];
+
+        m5 -> m6 [
+            style=dashed
+            color="#777777"
+            constraint=false
+            xlabel="Processing updates"
+        ];
+
+
+        // ========================================================
+        // INTERNAL OPERATIONS SUPPORT
+        // ========================================================
+
+        m8 -> m1 [
+            style=dashed
+            color="#777777"
+            constraint=false
+            xlabel="Account / access support"
+        ];
+
+        m8 -> m4 [
+            style=dashed
+            color="#777777"
+            constraint=false
+            xlabel="Operational support"
+        ];
+
+        m8 -> m6 [
+            style=dashed
+            color="#777777"
+            constraint=false
+            xlabel="Monitoring"
+        ];
+    }
+
+
+    // ============================================================
+    // LIMITATIONS / EXTERNAL CONDITIONS
+    // ============================================================
+
+    subgraph cluster_limitations {
+
+        label="SYSTEM LIMITATIONS /\nEXTERNAL CONDITIONS"
+        labelloc="t"
+
+        fontsize=12
+        fontname="Arial Bold"
+
+        color="#999999"
+        penwidth=1.2
+        style="dashed,rounded"
+
+        margin=15;
+
+        limitations [
+            label="Website Availability\n\nNetwork Connectivity\n\nRequest Timeout\n\nRate Limiting\n\nCAPTCHA / WAF /\nAnti-Bot Restrictions\n\nAuthentication-Protected Pages\n\nDynamic / JavaScript-Heavy Content\n\nExternal AI Availability /\nAPI Limits"
+            shape=box
+            style="filled"
+            fillcolor="#FFD6D6"
+            color="#CC6666"
+            width=2.5
+        ];
+    }
+
+
+    // ============================================================
+    // EXTERNAL SYSTEMS
+    // ============================================================
+
+    subgraph cluster_external {
+
+        label="EXTERNAL SYSTEMS\n(Out of Scope)"
+        labelloc="t"
+
+        fontsize=12
+        fontname="Arial Bold"
+
+        color="#999999"
+        penwidth=1.2
+        style="dashed,rounded"
+
+        margin=15;
+
+        target_websites [
+            label="Target Websites\n(External Websites)"
+            style="filled"
+            fillcolor="#E5DDFF"
+            color="#7666B3"
+            width=2.2
+        ];
+
+        ai_service [
+            label="External AI Service\n(LLM / AI API)"
+            style="filled"
+            fillcolor="#E5DDFF"
+            color="#7666B3"
+            width=2.2
+        ];
+
+        target_websites -> ai_service [
+            style=invis
+            weight=30
+        ];
+    }
+
+
+    // ============================================================
+    // RIGHT SIDE POSITIONING
+    // ============================================================
+
+    {
+        rank=same;
+        m1;
+        m2;
+        m3;
+        m4;
+        m5;
+        limitations;
+    }
+
+    m5 -> limitations [
+        style=invis
+        weight=100
+    ];
+
+    limitations -> target_websites [
+        style=invis
+        weight=70
+    ];
+
+
+    // ============================================================
+    // ACTOR POSITIONING
+    // ============================================================
+
+    seo_actor -> m1 [
+        style=invis
+        weight=100
+    ];
+
+    workspace_actor -> m2 [
+        style=invis
+        weight=100
+    ];
+
+    admin_actor -> m4 [
+        style=invis
+        weight=70
+    ];
+
+    support_actor -> m5 [
+        style=invis
+        weight=70
+    ];
+
+    platform_actor -> limitations [
+        style=invis
+        weight=50
+    ];
+
+
+    // ============================================================
+    // SHORT VISIBLE ACTOR RELATIONSHIPS
+    // ============================================================
+
+    seo_actor -> m1 [
+        constraint=false
+        xlabel="Uses"
+    ];
+
+    workspace_actor -> m2 [
+        constraint=false
+        xlabel="Manages"
+    ];
+
+    admin_actor -> m8 [
+        constraint=false
+        style=dashed
+        xlabel="Admin"
+    ];
+
+    support_actor -> m8 [
+        constraint=false
+        style=dashed
+        xlabel="Support"
+    ];
+
+    platform_actor -> m8 [
+        constraint=false
+        style=dashed
+        xlabel="Operate / Monitor"
+    ];
+
+
+    // ============================================================
+    // SIMPLIFIED EXTERNAL SYSTEM RELATIONSHIPS
+    // ============================================================
+
+    m4 -> target_websites [
+        constraint=false
+        color="#7666B3"
+        xlabel="HTTP / HTTPS"
+    ];
+
+    m5 -> ai_service [
+        constraint=false
+        color="#7666B3"
+        xlabel="AI request / response"
+    ];
+
+
+    // ============================================================
+    // SCOPE / LIMITATION NOTE
+    // ============================================================
+
+    scope_note [
+        label="TraceLink identifies and records supported external limitations.\nIt does not bypass authentication, CAPTCHA, WAF,\nanti-bot controls, or other website access restrictions."
+        shape=note
+        style="filled"
+        fillcolor="#FFF8D8"
+        color="#A88A2A"
+
+        fontname="Arial"
+        fontsize=9
+    ];
+
+    {
+        rank=same;
+        m6;
+        m7;
+        m8;
+        scope_note;
+    }
+
+    m8 -> scope_note [
+        style=invis
+        weight=60
+    ];
+}

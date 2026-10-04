@@ -1,0 +1,217 @@
+digraph TraceLink_Module_03 {
+
+    graph [
+        label="3. URL BATCH UPLOAD AND PREPARATION MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START
+    // ============================================================
+
+    start [
+        label="START\nPrepare URL Batch"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    select_context [
+        label="Select Personal or\nWorkspace Context"
+    ];
+
+    upload_file [
+        label="Upload CSV / XLSX File"
+    ];
+
+
+    // ============================================================
+    // FILE VALIDATION
+    // ============================================================
+
+    validate_file [
+        label="Validate File Type\nand File Size"
+    ];
+
+    file_valid [
+        label="Is the file supported\nand readable?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    upload_error [
+        label="Reject File and\nDisplay Upload Error"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+
+    // ============================================================
+    // PARSING / EXTRACTION
+    // ============================================================
+
+    parse_file [
+        label="Parse File Contents"
+    ];
+
+    extract_urls [
+        label="Extract URL Entries"
+    ];
+
+    normalize_urls [
+        label="Normalize URLs"
+    ];
+
+    validate_urls [
+        label="Validate URL Format\nand Supported Protocol"
+    ];
+
+
+    // ============================================================
+    // DATA QUALITY CHECKS
+    // ============================================================
+
+    identify_invalid [
+        label="Identify Invalid\nURL Entries"
+    ];
+
+    identify_duplicates [
+        label="Detect Duplicate\nNormalized URLs"
+    ];
+
+    preserve_traceability [
+        label="Preserve Source Row /\nTraceability Information"
+    ];
+
+
+    // ============================================================
+    // SUMMARY
+    // ============================================================
+
+    generate_summary [
+        label="Generate Batch\nPreparation Summary"
+    ];
+
+    summary_details [
+        label="Prepared Batch Summary\n\n• Valid URLs\n• Invalid URLs\n• Duplicate URLs\n• Total Processable URLs"
+        fillcolor="#EAF3FF"
+    ];
+
+    confirm_batch [
+        label="Confirm prepared batch?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    return_review [
+        label="Return to\nBatch Review"
+    ];
+
+
+    // ============================================================
+    // SAVE / NEXT MODULE
+    // ============================================================
+
+    save_batch [
+        label="Save Prepared\nURL Batch"
+    ];
+
+    batch_ready [
+        label="Batch Ready for Scan"
+    ];
+
+    next_module [
+        label="NEXT:\nBatch Scan and Technical URL Validation"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> select_context;
+    select_context -> upload_file;
+
+    upload_file -> validate_file;
+    validate_file -> file_valid;
+
+
+    // Invalid upload
+    file_valid -> upload_error [
+        xlabel="No"
+    ];
+
+    upload_error -> upload_file;
+
+
+    // Valid upload
+    file_valid -> parse_file [
+        xlabel="Yes"
+    ];
+
+    parse_file -> extract_urls;
+    extract_urls -> normalize_urls;
+    normalize_urls -> validate_urls;
+
+    validate_urls -> identify_invalid;
+    identify_invalid -> identify_duplicates;
+    identify_duplicates -> preserve_traceability;
+
+    preserve_traceability -> generate_summary;
+    generate_summary -> summary_details;
+    summary_details -> confirm_batch;
+
+
+    // Return to review
+    confirm_batch -> return_review [
+        xlabel="No"
+    ];
+
+    return_review -> summary_details;
+
+
+    // Confirm batch
+    confirm_batch -> save_batch [
+        xlabel="Yes"
+    ];
+
+    save_batch -> batch_ready;
+    batch_ready -> next_module;
+}

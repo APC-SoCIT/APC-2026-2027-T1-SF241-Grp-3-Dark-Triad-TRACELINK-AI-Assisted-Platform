@@ -1,0 +1,304 @@
+digraph TraceLink_Module_01 {
+
+    graph [
+        label="1. USER ACCESS AND ACCOUNT MANAGEMENT MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.5
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START
+    // ============================================================
+
+    start [
+        label="START\nAccess TraceLink"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    login_page [
+        label="Open TraceLink\nLogin Page"
+    ];
+
+    has_account [
+        label="Does the user already\nhave an account?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // REGISTRATION
+    // ============================================================
+
+    create_account [
+        label="Create Account"
+    ];
+
+    registration_details [
+        label="Enter Registration\nDetails"
+    ];
+
+    validate_registration [
+        label="Validate Registration\nDetails"
+    ];
+
+    registration_valid [
+        label="Are registration\ndetails valid?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    registration_error [
+        label="Display Registration\nError"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    create_user [
+        label="Create User Account"
+    ];
+
+    proceed_login [
+        label="Proceed to Login"
+    ];
+
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
+
+    credentials [
+        label="Enter Login\nCredentials"
+    ];
+
+    validate_credentials [
+        label="Validate Credentials"
+    ];
+
+    credentials_valid [
+        label="Are credentials\nvalid?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    login_error [
+        label="Display Login Error"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    load_access [
+        label="Load User Role, Account,\nand Authorized Access"
+    ];
+
+    dashboard [
+        label="Open Authorized\nDashboard"
+    ];
+
+    select_action [
+        label="Select account action\nor continue?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // EDIT ACCOUNT
+    // ============================================================
+
+    edit_account [
+        label="Edit Account Details"
+    ];
+
+    save_changes [
+        label="Save Changes"
+    ];
+
+
+    // ============================================================
+    // LOGOUT
+    // ============================================================
+
+    logout [
+        label="Logout"
+    ];
+
+    end_session [
+        label="End Session"
+    ];
+
+    logout_end [
+        label="END"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // ARCHIVE / DELETE
+    // ============================================================
+
+    archive_account [
+        label="Archive / Delete Account"
+    ];
+
+    confirm_request [
+        label="Confirm Request"
+    ];
+
+    process_status [
+        label="Process Account\nStatus Update"
+    ];
+
+    archive_end [
+        label="END"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // CONTINUE
+    // ============================================================
+
+    continue_work [
+        label="Continue to Workspace /\nURL Processing"
+    ];
+
+    next_module [
+        label="NEXT:\nWorkspace and Member Management"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> login_page;
+    login_page -> has_account;
+
+
+    // Existing account
+    has_account -> credentials [
+        xlabel="Yes"
+    ];
+
+
+    // Registration path
+    has_account -> create_account [
+        xlabel="No"
+    ];
+
+    create_account -> registration_details;
+    registration_details -> validate_registration;
+    validate_registration -> registration_valid;
+
+    registration_valid -> registration_error [
+        xlabel="No"
+    ];
+
+    registration_error -> registration_details;
+
+    registration_valid -> create_user [
+        xlabel="Yes"
+    ];
+
+    create_user -> proceed_login;
+    proceed_login -> credentials;
+
+
+    // Login validation
+    credentials -> validate_credentials;
+    validate_credentials -> credentials_valid;
+
+    credentials_valid -> login_error [
+        xlabel="No"
+    ];
+
+    login_error -> credentials;
+
+    credentials_valid -> load_access [
+        xlabel="Yes"
+    ];
+
+    load_access -> dashboard;
+    dashboard -> select_action;
+
+
+    // ============================================================
+    // ACCOUNT ACTIONS
+    // ============================================================
+
+    select_action -> edit_account [
+        xlabel="Edit"
+    ];
+
+    edit_account -> save_changes;
+    save_changes -> dashboard;
+
+
+    select_action -> logout [
+        xlabel="Logout"
+    ];
+
+    logout -> end_session;
+    end_session -> logout_end;
+
+
+    select_action -> archive_account [
+        xlabel="Archive / Delete"
+    ];
+
+    archive_account -> confirm_request;
+    confirm_request -> process_status;
+    process_status -> archive_end;
+
+
+    select_action -> continue_work [
+        xlabel="Continue"
+    ];
+
+    continue_work -> next_module;
+}

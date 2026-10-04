@@ -1,0 +1,388 @@
+digraph TraceLink_Module_02 {
+
+    graph [
+        label="2. WORKSPACE AND MEMBER MANAGEMENT MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START / CONTEXT SELECTION
+    // ============================================================
+
+    start [
+        label="START\nOpen Workspace Management"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    choose_context [
+        label="Use personal context\nor workspace?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    personal_context [
+        label="Continue Using\nPersonal Context"
+    ];
+
+    personal_next [
+        label="NEXT:\nURL Batch Upload and Preparation"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // WORKSPACE ENTRY
+    // ============================================================
+
+    workspace_choice [
+        label="Create new workspace\nor select existing?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    enter_workspace_details [
+        label="Enter Workspace\nDetails"
+    ];
+
+    validate_workspace_details [
+        label="Validate Workspace\nDetails"
+    ];
+
+    workspace_details_valid [
+        label="Are workspace\ndetails valid?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    workspace_validation_error [
+        label="Display Workspace\nValidation Error"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    create_workspace [
+        label="Create Workspace"
+    ];
+
+    select_workspace [
+        label="Select Existing\nWorkspace"
+    ];
+
+    open_workspace [
+        label="Open Workspace\nDashboard"
+    ];
+
+
+    // ============================================================
+    // MAIN WORKSPACE ACTION
+    // ============================================================
+
+    workspace_action [
+        label="Manage workspace,\nmembers, or continue?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // WORKSPACE DETAILS BRANCH
+    // ============================================================
+
+    check_workspace_permission [
+        label="Authorized to manage\nworkspace settings?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    edit_workspace [
+        label="Edit Workspace\nDetails / Settings"
+    ];
+
+    save_workspace [
+        label="Save Workspace\nChanges"
+    ];
+
+
+    // ============================================================
+    // MEMBER MANAGEMENT BRANCH
+    // ============================================================
+
+    check_member_permission [
+        label="Authorized to manage\nworkspace members?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    view_members [
+        label="View Current Members"
+    ];
+
+    member_action [
+        label="Invite member,\nchange role, or remove?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // Invite
+    enter_member [
+        label="Enter Member\nEmail / Details"
+    ];
+
+    send_invitation [
+        label="Send Invitation"
+    ];
+
+
+    // Change role
+    select_role_member [
+        label="Select Member"
+    ];
+
+    assign_role [
+        label="Assign Workspace\nRole / Permission"
+    ];
+
+    save_role [
+        label="Save Role Update"
+    ];
+
+
+    // Remove
+    select_remove_member [
+        label="Select Member"
+    ];
+
+    confirm_removal [
+        label="Confirm Removal"
+    ];
+
+    remove_member [
+        label="Remove Member"
+    ];
+
+
+    // ============================================================
+    // SHARED ERROR / RETURN
+    // ============================================================
+
+    permission_denied [
+        label="Display Permission\nDenied"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    return_dashboard [
+        label="Return to Workspace\nDashboard"
+    ];
+
+    continue_batch [
+        label="Continue to URL\nBatch Processing"
+    ];
+
+    next_module [
+        label="NEXT:\nURL Batch Upload and Preparation"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> choose_context;
+
+
+    // ------------------------------------------------------------
+    // PERSONAL CONTEXT
+    // ------------------------------------------------------------
+
+    choose_context -> personal_context [
+        xlabel="Personal"
+    ];
+
+    personal_context -> personal_next;
+
+
+    // ------------------------------------------------------------
+    // WORKSPACE CONTEXT
+    // ------------------------------------------------------------
+
+    choose_context -> workspace_choice [
+        xlabel="Workspace"
+    ];
+
+
+    // Create workspace
+    workspace_choice -> enter_workspace_details [
+        xlabel="Create"
+    ];
+
+    enter_workspace_details -> validate_workspace_details;
+    validate_workspace_details -> workspace_details_valid;
+
+    workspace_details_valid -> workspace_validation_error [
+        xlabel="No"
+    ];
+
+    workspace_validation_error -> enter_workspace_details;
+
+    workspace_details_valid -> create_workspace [
+        xlabel="Yes"
+    ];
+
+    create_workspace -> open_workspace;
+
+
+    // Select existing workspace
+    workspace_choice -> select_workspace [
+        xlabel="Select"
+    ];
+
+    select_workspace -> open_workspace;
+
+
+    // ============================================================
+    // WORKSPACE DASHBOARD
+    // ============================================================
+
+    open_workspace -> workspace_action;
+
+
+    // ------------------------------------------------------------
+    // MANAGE WORKSPACE DETAILS
+    // ------------------------------------------------------------
+
+    workspace_action -> check_workspace_permission [
+        xlabel="Workspace"
+    ];
+
+    check_workspace_permission -> permission_denied [
+        xlabel="No"
+    ];
+
+    check_workspace_permission -> edit_workspace [
+        xlabel="Yes"
+    ];
+
+    edit_workspace -> save_workspace;
+    save_workspace -> return_dashboard;
+
+
+    // ------------------------------------------------------------
+    // MANAGE MEMBERS
+    // ------------------------------------------------------------
+
+    workspace_action -> check_member_permission [
+        xlabel="Members"
+    ];
+
+    check_member_permission -> permission_denied [
+        xlabel="No"
+    ];
+
+    check_member_permission -> view_members [
+        xlabel="Yes"
+    ];
+
+    view_members -> member_action;
+
+
+    // Invite
+    member_action -> enter_member [
+        xlabel="Invite"
+    ];
+
+    enter_member -> send_invitation;
+    send_invitation -> return_dashboard;
+
+
+    // Change role
+    member_action -> select_role_member [
+        xlabel="Change Role"
+    ];
+
+    select_role_member -> assign_role;
+    assign_role -> save_role;
+    save_role -> return_dashboard;
+
+
+    // Remove
+    member_action -> select_remove_member [
+        xlabel="Remove"
+    ];
+
+    select_remove_member -> confirm_removal;
+    confirm_removal -> remove_member;
+    remove_member -> return_dashboard;
+
+
+    // ------------------------------------------------------------
+    // PERMISSION FAILURE
+    // ------------------------------------------------------------
+
+    permission_denied -> return_dashboard;
+
+
+    // ------------------------------------------------------------
+    // RETURN TO DASHBOARD
+    // ------------------------------------------------------------
+
+    return_dashboard -> open_workspace;
+
+
+    // ------------------------------------------------------------
+    // CONTINUE TO MODULE 3
+    // ------------------------------------------------------------
+
+    workspace_action -> continue_batch [
+        xlabel="Continue"
+    ];
+
+    continue_batch -> next_module;
+}

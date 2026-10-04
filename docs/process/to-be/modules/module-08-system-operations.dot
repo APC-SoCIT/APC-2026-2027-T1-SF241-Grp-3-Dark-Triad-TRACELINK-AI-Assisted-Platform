@@ -1,0 +1,286 @@
+digraph TraceLink_Module_08 {
+
+    graph [
+        label="8. SYSTEM OPERATIONS, SUPPORT, AND SECURITY ADMINISTRATION MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.6
+        ranksep=0.7
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START / AUTHORIZATION
+    // ============================================================
+
+    start [
+        label="START\nAuthorized Internal User"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    open_internal [
+        label="Open Internal Operations /\nSupport Interface"
+    ];
+
+    validate_role [
+        label="Validate Internal Role\nand Permission"
+    ];
+
+    authorized [
+        label="Is access authorized?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    deny_access [
+        label="Deny Access and\nRecord Event"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    deny_end [
+        label="END"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // SELECT OPERATION
+    // ============================================================
+
+    select_function [
+        label="Select Internal\nOperational Function"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // SUPPORT OPERATIONS
+    // ============================================================
+
+    support_queue [
+        label="View Support\nCase Queue"
+    ];
+
+    support_case [
+        label="Open Support Case"
+    ];
+
+    support_diagnostics [
+        label="Review Authorized Diagnostics /\nIssue Details"
+    ];
+
+    support_action [
+        label="Update / Escalate /\nResolve Case"
+    ];
+
+
+    // ============================================================
+    // SYSTEM MONITORING
+    // ============================================================
+
+    review_queue [
+        label="Review Queue and\nWorker Status"
+    ];
+
+    review_health [
+        label="Review Service Health,\nErrors, and Usage Metrics"
+    ];
+
+    abnormal_condition [
+        label="Identify Abnormal\nCondition"
+    ];
+
+    monitoring_action [
+        label="Record / Escalate\nOperational Issue"
+    ];
+
+
+    // ============================================================
+    // ADMINISTRATION
+    // ============================================================
+
+    manage_accounts [
+        label="Manage User Accounts"
+    ];
+
+    manage_access [
+        label="Update User Access /\nStatus / Permissions"
+    ];
+
+    security_events [
+        label="Review Account\nSecurity Events"
+    ];
+
+
+    // ============================================================
+    // LOGS / DATA INTEGRITY
+    // ============================================================
+
+    review_logs [
+        label="Review System and\nActivity Logs"
+    ];
+
+    check_integrity [
+        label="Verify Stored\nData Integrity"
+    ];
+
+    review_access_events [
+        label="Review Security /\nAccess Events"
+    ];
+
+
+    // ============================================================
+    // COMMON COMPLETION
+    // ============================================================
+
+    record_action [
+        label="Record Authorized\nAdministrative Action / Outcome"
+    ];
+
+    return_dashboard [
+        label="Return to Internal\nDashboard"
+    ];
+
+    continue_internal [
+        label="Perform another\ninternal function?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    end [
+        label="END"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> open_internal;
+    open_internal -> validate_role;
+    validate_role -> authorized;
+
+
+    // Unauthorized
+    authorized -> deny_access [
+        xlabel="No"
+    ];
+
+    deny_access -> deny_end;
+
+
+    // Authorized
+    authorized -> select_function [
+        xlabel="Yes"
+    ];
+
+
+    // ============================================================
+    // SUPPORT BRANCH
+    // ============================================================
+
+    select_function -> support_queue [
+        xlabel="Support"
+    ];
+
+    support_queue -> support_case;
+    support_case -> support_diagnostics;
+    support_diagnostics -> support_action;
+    support_action -> record_action;
+
+
+    // ============================================================
+    // MONITORING BRANCH
+    // ============================================================
+
+    select_function -> review_queue [
+        xlabel="Monitoring"
+    ];
+
+    review_queue -> review_health;
+    review_health -> abnormal_condition;
+    abnormal_condition -> monitoring_action;
+    monitoring_action -> record_action;
+
+
+    // ============================================================
+    // ADMINISTRATION BRANCH
+    // ============================================================
+
+    select_function -> manage_accounts [
+        xlabel="Administration"
+    ];
+
+    manage_accounts -> manage_access;
+    manage_access -> security_events;
+    security_events -> record_action;
+
+
+    // ============================================================
+    // LOGS / DATA BRANCH
+    // ============================================================
+
+    select_function -> review_logs [
+        xlabel="Logs / Data"
+    ];
+
+    review_logs -> check_integrity;
+    check_integrity -> review_access_events;
+    review_access_events -> record_action;
+
+
+    // ============================================================
+    // COMMON EXIT / LOOP
+    // ============================================================
+
+    record_action -> return_dashboard;
+    return_dashboard -> continue_internal;
+
+    continue_internal -> select_function [
+        xlabel="Yes"
+    ];
+
+    continue_internal -> end [
+        xlabel="No"
+    ];
+}

@@ -1,0 +1,225 @@
+digraph TraceLink_Module_07 {
+
+    graph [
+        label="7. SCAN RESULT REVIEW AND REPORTING MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START
+    // ============================================================
+
+    start [
+        label="START\nReview Completed Scan Results"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    open_results [
+        label="Open Results Dashboard"
+    ];
+
+    display_summary [
+        label="Display Scan Result Summary\n\n• Technical Status\n• Redirect Information\n• Structure Findings\n• AI Evaluation Summary\n• Error Counts"
+    ];
+
+
+    // ============================================================
+    // SEARCH / FILTER
+    // ============================================================
+
+    search_filter [
+        label="Search / Filter Results"
+    ];
+
+    open_detail [
+        label="Open Individual\nURL Result Detail"
+    ];
+
+
+    // ============================================================
+    // MANUAL REVIEW
+    // ============================================================
+
+    requires_review [
+        label="Does the result require\nmanual review?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    retain_result [
+        label="Retain Existing\nAutomated Result"
+    ];
+
+    review_findings [
+        label="Review Original Technical,\nStructure, and AI Findings"
+    ];
+
+    manual_override [
+        label="Record Manual Review /\nOverride Decision"
+    ];
+
+    preserve_original [
+        label="Preserve Original\nAutomated Result"
+    ];
+
+
+    // ============================================================
+    // RETURN TO RESULTS
+    // ============================================================
+
+    return_results [
+        label="Return to Results Dashboard"
+    ];
+
+    more_results [
+        label="Review another\nURL result?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // EXPORT
+    // ============================================================
+
+    export_results [
+        label="Generate report export?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    select_export [
+        label="Select Export Scope\nand Format"
+    ];
+
+    generate_report [
+        label="Generate CSV / XLSX Report"
+    ];
+
+    export_report [
+        label="Download / Export Report"
+    ];
+
+
+    // ============================================================
+    // END
+    // ============================================================
+
+    end_no_export [
+        label="END\nReturn to Dashboard"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    end_export [
+        label="END\nReport Exported"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> open_results;
+    open_results -> display_summary;
+    display_summary -> search_filter;
+    search_filter -> open_detail;
+    open_detail -> requires_review;
+
+
+    // ------------------------------------------------------------
+    // NO MANUAL REVIEW
+    // ------------------------------------------------------------
+
+    requires_review -> retain_result [
+        xlabel="No"
+    ];
+
+    retain_result -> return_results;
+
+
+    // ------------------------------------------------------------
+    // MANUAL REVIEW REQUIRED
+    // ------------------------------------------------------------
+
+    requires_review -> review_findings [
+        xlabel="Yes"
+    ];
+
+    review_findings -> manual_override;
+    manual_override -> preserve_original;
+    preserve_original -> return_results;
+
+
+    // ------------------------------------------------------------
+    // REVIEW MORE RESULTS
+    // ------------------------------------------------------------
+
+    return_results -> more_results;
+
+    more_results -> search_filter [
+        xlabel="Yes"
+    ];
+
+    more_results -> export_results [
+        xlabel="No"
+    ];
+
+
+    // ------------------------------------------------------------
+    // EXPORT
+    // ------------------------------------------------------------
+
+    export_results -> end_no_export [
+        xlabel="No"
+    ];
+
+    export_results -> select_export [
+        xlabel="Yes"
+    ];
+
+    select_export -> generate_report;
+    generate_report -> export_report;
+    export_report -> end_export;
+}

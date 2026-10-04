@@ -1,0 +1,367 @@
+digraph TraceLink_Module_04 {
+
+    graph [
+        label="4. BATCH SCAN AND TECHNICAL URL VALIDATION MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START / SCAN JOB
+    // ============================================================
+
+    start [
+        label="START\nInitiate Batch Scan"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    select_batch [
+        label="Select Prepared\nURL Batch"
+    ];
+
+    create_scan [
+        label="Create Scan Job"
+    ];
+
+    queue_urls [
+        label="Queue URLs for Processing"
+    ];
+
+    fetch_url [
+        label="Fetch Next URL\nfrom Queue"
+    ];
+
+    remaining_urls [
+        label="Are there remaining\nURLs to process?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // END OF QUEUE
+    // ============================================================
+
+    complete_queue [
+        label="Mark URL Queue\nProcessing Complete"
+    ];
+
+    queue_end [
+        label="END OF SCAN QUEUE\nProcessing Completed"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // SAFE URL / REQUEST VALIDATION
+    // ============================================================
+
+    safe_validation [
+        label="Perform Safe URL /\nRequest Validation"
+    ];
+
+    allowed_url [
+        label="Is the URL allowed\nfor processing?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    rejected_url [
+        label="Record Rejected /\nUnsupported URL Reason"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+
+    // ============================================================
+    // HTTP REQUEST
+    // ============================================================
+
+    send_request [
+        label="Send Controlled\nHTTP / HTTPS Request"
+    ];
+
+    request_outcome [
+        label="Did the request\ncomplete successfully?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    classify_failure [
+        label="Classify Request /\nNetwork Failure"
+    ];
+
+    failure_type [
+        label="Failure Type"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    record_timeout [
+        label="Record Timeout"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    record_dns [
+        label="Record DNS /\nConnection Failure"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    record_other_failure [
+        label="Record Other Supported\nRequest Failure"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+
+    // ============================================================
+    // HTTP RESPONSE / REDIRECT
+    // ============================================================
+
+    read_response [
+        label="Read HTTP Response"
+    ];
+
+    is_redirect [
+        label="Is the response\na redirect?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    record_redirect [
+        label="Record Redirect\nInformation"
+    ];
+
+    validate_redirect [
+        label="Validate Redirect\nDestination"
+    ];
+
+    redirect_limit [
+        label="Within allowed\nredirect limit?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    redirect_limit_error [
+        label="Record Redirect\nLimit Failure"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+
+    // ============================================================
+    // ACCESSIBILITY
+    // ============================================================
+
+    page_accessible [
+        label="Is the webpage\naccessible?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    inaccessible_result [
+        label="Record Technical Failure Status\n\n• Broken / Not Found\n• Forbidden / Restricted\n• Rate Limited\n• Server Error"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    accessible_result [
+        label="Record Accessible\nTechnical Result"
+    ];
+
+
+    // ============================================================
+    // HANDOFF TO MODULE 5
+    // ============================================================
+
+    pass_analysis [
+        label="Pass Accessible URL\nto Webpage Analysis"
+    ];
+
+    module5_handoff [
+        label="HANDOFF TO MODULE 5\nWebpage Retrieval and\nAI-Assisted Analysis"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> select_batch;
+    select_batch -> create_scan;
+    create_scan -> queue_urls;
+    queue_urls -> fetch_url;
+    fetch_url -> remaining_urls;
+
+
+    // ------------------------------------------------------------
+    // NO MORE URLS
+    // ------------------------------------------------------------
+
+    remaining_urls -> complete_queue [
+        xlabel="No"
+    ];
+
+    complete_queue -> queue_end;
+
+
+    // ------------------------------------------------------------
+    // PROCESS NEXT URL
+    // ------------------------------------------------------------
+
+    remaining_urls -> safe_validation [
+        xlabel="Yes"
+    ];
+
+    safe_validation -> allowed_url;
+
+
+    // URL rejected before request
+    allowed_url -> rejected_url [
+        xlabel="No"
+    ];
+
+    rejected_url -> fetch_url;
+
+
+    // URL permitted
+    allowed_url -> send_request [
+        xlabel="Yes"
+    ];
+
+    send_request -> request_outcome;
+
+
+    // ============================================================
+    // REQUEST FAILURE
+    // ============================================================
+
+    request_outcome -> classify_failure [
+        xlabel="No"
+    ];
+
+    classify_failure -> failure_type;
+
+    failure_type -> record_timeout [
+        xlabel="Timeout"
+    ];
+
+    failure_type -> record_dns [
+        xlabel="DNS / Connection"
+    ];
+
+    failure_type -> record_other_failure [
+        xlabel="Other"
+    ];
+
+    record_timeout -> fetch_url;
+    record_dns -> fetch_url;
+    record_other_failure -> fetch_url;
+
+
+    // ============================================================
+    // SUCCESSFUL HTTP RESPONSE
+    // ============================================================
+
+    request_outcome -> read_response [
+        xlabel="Yes"
+    ];
+
+    read_response -> is_redirect;
+
+
+    // ============================================================
+    // REDIRECT
+    // ============================================================
+
+    is_redirect -> record_redirect [
+        xlabel="Yes"
+    ];
+
+    record_redirect -> validate_redirect;
+    validate_redirect -> redirect_limit;
+
+    redirect_limit -> redirect_limit_error [
+        xlabel="No"
+    ];
+
+    redirect_limit_error -> fetch_url;
+
+    redirect_limit -> send_request [
+        xlabel="Yes"
+    ];
+
+
+    // ============================================================
+    // NON-REDIRECT RESPONSE
+    // ============================================================
+
+    is_redirect -> page_accessible [
+        xlabel="No"
+    ];
+
+    page_accessible -> inaccessible_result [
+        xlabel="No"
+    ];
+
+    inaccessible_result -> fetch_url;
+
+
+    // ============================================================
+    // ACCESSIBLE PAGE
+    // ============================================================
+
+    page_accessible -> accessible_result [
+        xlabel="Yes"
+    ];
+
+    accessible_result -> pass_analysis;
+    pass_analysis -> module5_handoff;
+}

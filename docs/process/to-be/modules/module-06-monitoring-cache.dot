@@ -1,0 +1,276 @@
+digraph TraceLink_Module_06 {
+
+    graph [
+        label="6. SCAN MONITORING AND CACHE HANDLING MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START
+    // ============================================================
+
+    start [
+        label="START\nOpen Scan Monitoring View"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    select_scan [
+        label="Select Scan Job"
+    ];
+
+    display_progress [
+        label="Display Current Scan Progress\n\n• Total URLs\n• Processed\n• Pending\n• Failed\n• Completed"
+    ];
+
+
+    // ============================================================
+    // MONITORING DECISION
+    // ============================================================
+
+    inspect_url [
+        label="Inspect a specific\nURL result?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    scan_running [
+        label="Is the scan\nstill running?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    refresh_progress [
+        label="Refresh Progress View"
+    ];
+
+
+    // ============================================================
+    // URL RESULT / CACHE CHECK
+    // ============================================================
+
+    open_url_details [
+        label="Open URL\nProcessing Details"
+    ];
+
+    cache_available [
+        label="Is a cached result\navailable?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    use_new_result [
+        label="Use Newly\nProcessed Result"
+    ];
+
+    check_freshness [
+        label="Check Cache Freshness"
+    ];
+
+    cache_fresh [
+        label="Is the cached result\nfresh and reusable?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // FRESH CACHE
+    // ============================================================
+
+    reuse_cache [
+        label="Reuse Cached Result"
+    ];
+
+    record_cache_reuse [
+        label="Record Cache Reuse"
+    ];
+
+
+    // ============================================================
+    // STALE CACHE
+    // ============================================================
+
+    mark_stale [
+        label="Mark Cached Result\nas Stale"
+    ];
+
+    trigger_reprocess [
+        label="Trigger Revalidation /\nReprocessing"
+    ];
+
+    update_cache [
+        label="Update Cached Result\nWith New Data"
+    ];
+
+
+    // ============================================================
+    // RETURN TO MONITORING
+    // ============================================================
+
+    return_monitoring [
+        label="Return to Scan\nMonitoring"
+    ];
+
+
+    // ============================================================
+    // COMPLETED SCAN
+    // ============================================================
+
+    completed_scan [
+        label="Open Completed\nScan Summary"
+    ];
+
+    finalize_monitoring [
+        label="Finalize Scan\nMonitoring Status"
+    ];
+
+    next_module [
+        label="NEXT:\nScan Result Review and Reporting"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> select_scan;
+    select_scan -> display_progress;
+    display_progress -> inspect_url;
+
+
+    // ------------------------------------------------------------
+    // NO SPECIFIC URL INSPECTION
+    // ------------------------------------------------------------
+
+    inspect_url -> scan_running [
+        xlabel="No"
+    ];
+
+    scan_running -> refresh_progress [
+        xlabel="Yes"
+    ];
+
+    refresh_progress -> display_progress;
+
+    scan_running -> completed_scan [
+        xlabel="No"
+    ];
+
+    completed_scan -> finalize_monitoring;
+    finalize_monitoring -> next_module;
+
+
+    // ------------------------------------------------------------
+    // INSPECT SPECIFIC URL
+    // ------------------------------------------------------------
+
+    inspect_url -> open_url_details [
+        xlabel="Yes"
+    ];
+
+    open_url_details -> cache_available;
+
+
+    // No cache
+    cache_available -> use_new_result [
+        xlabel="No"
+    ];
+
+    use_new_result -> return_monitoring;
+
+
+    // Cache exists
+    cache_available -> check_freshness [
+        xlabel="Yes"
+    ];
+
+    check_freshness -> cache_fresh;
+
+
+    // Fresh cache
+    cache_fresh -> reuse_cache [
+        xlabel="Yes"
+    ];
+
+    reuse_cache -> record_cache_reuse;
+    record_cache_reuse -> return_monitoring;
+
+
+    // Stale cache
+    cache_fresh -> mark_stale [
+        xlabel="No"
+    ];
+
+    mark_stale -> trigger_reprocess;
+    trigger_reprocess -> update_cache;
+    update_cache -> return_monitoring;
+
+
+    // ------------------------------------------------------------
+    // LOOP BACK TO MONITORING VIEW
+    // ------------------------------------------------------------
+
+    return_monitoring -> display_progress;
+
+
+    // ============================================================
+    // LAYOUT HELPERS
+    // Keep final Module 7 exit visually below cache handling.
+    // ============================================================
+
+    update_cache -> finalize_monitoring [
+        style=invis
+        weight=20
+    ];
+
+    record_cache_reuse -> finalize_monitoring [
+        style=invis
+        weight=20
+    ];
+
+    use_new_result -> finalize_monitoring [
+        style=invis
+        weight=20
+    ];
+}

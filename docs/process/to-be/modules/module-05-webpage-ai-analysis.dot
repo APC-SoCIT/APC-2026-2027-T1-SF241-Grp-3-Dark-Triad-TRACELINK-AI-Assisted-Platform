@@ -1,0 +1,299 @@
+digraph TraceLink_Module_05 {
+
+    graph [
+        label="5. WEBPAGE RETRIEVAL AND AI-ASSISTED ANALYSIS MODULE"
+        labelloc="t"
+        fontsize=22
+        fontname="Arial Bold"
+        bgcolor="white"
+
+        rankdir=TB
+        pad=0.35
+        nodesep=0.55
+        ranksep=0.65
+
+        splines=ortho
+    ];
+
+    node [
+        shape=box
+        style="filled"
+        fillcolor="#CFE5FF"
+        color="#1F5F99"
+        penwidth=1.2
+
+        fontname="Arial"
+        fontsize=11
+
+        margin="0.18,0.10"
+    ];
+
+    edge [
+        color="#333333"
+        penwidth=1.0
+        fontname="Arial"
+        fontsize=10
+        arrowsize=0.7
+    ];
+
+
+    // ============================================================
+    // START
+    // ============================================================
+
+    start [
+        label="START\nAccessible URL Received"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+    retrieve_content [
+        label="Retrieve Accessible\nWebpage Content"
+    ];
+
+    sufficient_content [
+        label="Was sufficient\ncontent retrieved?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+
+    // ============================================================
+    // CONTENT RETRIEVAL LIMITATION
+    // ============================================================
+
+    retrieval_limitation [
+        label="Record Content\nRetrieval Limitation"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    store_technical_only [
+        label="Preserve Available\nTechnical Result"
+    ];
+
+
+    // ============================================================
+    // STRUCTURE ANALYSIS
+    // ============================================================
+
+    analyze_structure [
+        label="Analyze Supported\nWebpage Structure"
+    ];
+
+    structure_details [
+        label="Supported Elements\n\n• Page Title\n• Metadata\n• Headings\n• Links\n• Forms\n• Interactive Elements"
+        fillcolor="#EAF3FF"
+    ];
+
+    prepare_content [
+        label="Prepare Webpage Content\nfor Evaluation"
+    ];
+
+
+    // ============================================================
+    // AI ELIGIBILITY
+    // ============================================================
+
+    ai_eligible [
+        label="Is the page eligible\nfor AI evaluation?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    store_structure_only [
+        label="Store Structure\nAnalysis Only"
+    ];
+
+
+    // ============================================================
+    // EXTERNAL AI SERVICE
+    // ============================================================
+
+    send_ai [
+        label="Send Prepared Content\nand Defined Criteria"
+    ];
+
+    external_ai [
+        label="External AI Service\n(Out of TraceLink Scope)"
+        shape=box
+        style="rounded,filled"
+        fillcolor="#E5DDFF"
+        color="#7666B3"
+        penwidth=1.2
+    ];
+
+    ai_success [
+        label="Did AI evaluation\nsucceed?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    ai_failure [
+        label="Record AI Evaluation\nFailure / Unavailable"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    preserve_existing [
+        label="Preserve Technical and\nStructure Results"
+    ];
+
+
+    // ============================================================
+    // AI RESULT VALIDATION
+    // ============================================================
+
+    receive_ai_result [
+        label="Receive Structured\nAI Evaluation Result"
+    ];
+
+    validate_ai_result [
+        label="Validate AI\nResult Format"
+    ];
+
+    ai_result_valid [
+        label="Is the AI result\nvalid?"
+        shape=diamond
+        fillcolor="#FFE69A"
+        color="#C58B00"
+    ];
+
+    invalid_ai_result [
+        label="Record Invalid\nAI Response"
+        fillcolor="#FFB8B8"
+        color="#CC3333"
+    ];
+
+    store_ai_result [
+        label="Store AI-Assisted Findings\n\n• Relevance\n• Quality / Usefulness\n• Keyword Alignment\n• Spam-Like Indicators"
+    ];
+
+
+    // ============================================================
+    // FINAL RESULT / RETURN TO SCAN FLOW
+    // ============================================================
+
+    save_analysis [
+        label="Save Available\nURL Analysis Results"
+    ];
+
+    return_scan [
+        label="RETURN TO SCAN FLOW\nContinue With Next URL"
+        shape=oval
+        fillcolor="#B7EFB0"
+        color="#16833C"
+    ];
+
+
+    // ============================================================
+    // MAIN FLOW
+    // ============================================================
+
+    start -> retrieve_content;
+    retrieve_content -> sufficient_content;
+
+
+    // ------------------------------------------------------------
+    // INSUFFICIENT CONTENT
+    // ------------------------------------------------------------
+
+    sufficient_content -> retrieval_limitation [
+        xlabel="No"
+    ];
+
+    retrieval_limitation -> store_technical_only;
+    store_technical_only -> save_analysis;
+
+
+    // ------------------------------------------------------------
+    // CONTENT AVAILABLE
+    // ------------------------------------------------------------
+
+    sufficient_content -> analyze_structure [
+        xlabel="Yes"
+    ];
+
+    analyze_structure -> structure_details;
+    structure_details -> prepare_content;
+    prepare_content -> ai_eligible;
+
+
+    // ------------------------------------------------------------
+    // NO AI REQUIRED / ELIGIBLE
+    // ------------------------------------------------------------
+
+    ai_eligible -> store_structure_only [
+        xlabel="No"
+    ];
+
+    store_structure_only -> save_analysis;
+
+
+    // ------------------------------------------------------------
+    // SEND TO AI
+    // ------------------------------------------------------------
+
+    ai_eligible -> send_ai [
+        xlabel="Yes"
+    ];
+
+    send_ai -> external_ai [
+        xlabel="Prepared content + criteria"
+    ];
+
+    external_ai -> ai_success [
+        xlabel="Evaluation response"
+    ];
+
+
+    // ------------------------------------------------------------
+    // AI FAILURE
+    // ------------------------------------------------------------
+
+    ai_success -> ai_failure [
+        xlabel="No"
+    ];
+
+    ai_failure -> preserve_existing;
+    preserve_existing -> save_analysis;
+
+
+    // ------------------------------------------------------------
+    // AI SUCCESS
+    // ------------------------------------------------------------
+
+    ai_success -> receive_ai_result [
+        xlabel="Yes"
+    ];
+
+    receive_ai_result -> validate_ai_result;
+    validate_ai_result -> ai_result_valid;
+
+
+    // Invalid AI output
+    ai_result_valid -> invalid_ai_result [
+        xlabel="No"
+    ];
+
+    invalid_ai_result -> preserve_existing;
+
+
+    // Valid AI output
+    ai_result_valid -> store_ai_result [
+        xlabel="Yes"
+    ];
+
+    store_ai_result -> save_analysis;
+
+
+    // ------------------------------------------------------------
+    // RETURN TO MODULE 4 SCAN LOOP
+    // ------------------------------------------------------------
+
+    save_analysis -> return_scan;
+}
