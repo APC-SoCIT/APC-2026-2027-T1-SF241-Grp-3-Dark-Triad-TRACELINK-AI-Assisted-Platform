@@ -1,0 +1,54 @@
+@startuml TraceLink_Container_Diagram
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+LAYOUT_LEFT_RIGHT()
+
+title Container Diagram - TraceLink
+
+Person(seo, "SEO Specialist", "Uploads URL datasets, initiates scans, reviews results, and collaborates within a workspace")
+Person(owner, "Workspace Owner / Team Administrator", "Creates and manages team workspaces, members, and workspace roles")
+Person(admin, "System Administrator", "Manages user accounts and platform-wide access and reviews system information")
+Person(support, "Operations / Support Staff", "Investigates reported issues and handles support cases")
+Person(platform, "Project Team / Platform Operator", "Monitors platform usage, performance, reliability, and improvement initiatives")
+
+System_Boundary(tracelink, "TraceLink") {
+
+    Container(webapp, "Web Application", "React + Vite + Tailwind (SPA)", "Provides role- and workspace-scoped views for URL upload, scan monitoring, result review, workspace and account management, support, and platform monitoring")
+
+    Container(api, "API Application", "Express (Node.js) REST API", "Handles application requests, validates uploads, normalizes and deduplicates URLs, manages accounts and workspaces, enforces authorization, creates scan jobs, serves results, and manages application records")
+
+    ContainerQueue(queue, "Task Queue", "Redis + BullMQ", "Temporarily holds URL validation tasks and distributes them for asynchronous processing")
+
+    Container(worker, "Worker Service", "Node.js + BullMQ", "Consumes queued URL tasks, validates URLs, retrieves and analyzes webpage data, prepares content for AI-assisted evaluation, invokes the external AI service, and persists processing results")
+
+    ContainerDb(db, "Database", "PostgreSQL via Prisma", "Stores accounts, workspaces, memberships and roles, URL batches, scan jobs, normalized URLs, validation results, extracted page elements, AI classifications, cache and freshness data, review records, support cases, and other persistent application records")
+
+    Container(logging, "Structured Logging", "Structured JSON Events", "Records operational and system events separately from ordinary relational transaction records")
+}
+
+System_Ext(websites, "Target Websites", "External websites and URLs processed by TraceLink")
+System_Ext(ai, "Anthropic Claude API (Sonnet)", "Provides AI-assisted webpage content evaluation against defined criteria")
+
+Rel(seo, webapp, "Uses", "HTTPS")
+Rel(owner, webapp, "Uses", "HTTPS")
+Rel(admin, webapp, "Uses", "HTTPS")
+Rel(support, webapp, "Uses", "HTTPS")
+Rel(platform, webapp, "Uses", "HTTPS")
+
+Rel(webapp, api, "Makes API calls to", "HTTPS/JSON")
+
+Rel(api, queue, "Publishes URL validation tasks to")
+Rel(queue, worker, "Delivers queued tasks to")
+
+Rel(api, db, "Reads from and writes to")
+Rel(worker, db, "Reads from and writes to")
+
+Rel(worker, websites, "Sends validation and content requests to", "HTTPS")
+Rel(worker, ai, "Sends prepared webpage content for evaluation to", "HTTPS/JSON")
+
+Rel(api, logging, "Emits structured operational events to", "JSON")
+Rel(worker, logging, "Emits processing and failure events to", "JSON")
+
+@enduml
