@@ -1,0 +1,93 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for TraceLink (Synchronized with Container Diagram)
+
+' ACTORS
+Person(seo, "SEO Specialist", "Uploads URL datasets, initiates scans, reviews results, and collaborates within a workspace")
+Person(owner, "Workspace Owner / Team Administrator", "Creates and manages team workspaces, members, and workspace roles")
+Person(sysadmin, "System Administrator", "Manages user accounts and platform-wide access and reviews system information")
+Person(support, "Operations / Support Staff", "Investigates reported issues and handles support cases")
+Person(operator, "Project Team / Platform Operator", "Monitors platform usage, performance, reliability, and improvement initiatives")
+
+' EXTERNAL SYSTEMS
+System_Ext(target_sites, "Target Websites", "External websites and URLs processed by TraceLink")
+System_Ext(anthropic_api, "Anthropic Claude API (Sonnet)", "Provides AI-assisted webpage content evaluation against defined criteria")
+
+' API APPLICATION CONTAINER
+Container_Boundary(api_app, "API Application") {
+    
+    Component(iam, "IAM Component", "Express/Node.js", "Authentication & Account Lifecycle: Handles Create, Login/Logout, Edit, Archive, and Delete Account")
+    
+    Component(workspace, "Workspace Orchestrator", "Express/Node.js", "Manage Workspaces: Handles Workspace Creation, Editing, Deletion, and Workspace Members/Roles")
+    
+    Component(ingest, "Batch Ingestion Component", "Express/Node.js", "Upload Batch URLs: Handles invalid URLs alongside normalization, duplicate detection, and queue publishing")
+    
+    Component(report, "Reporting & Analytics", "Express/Node.js", "Result Review: Handles View/Filter Scan Results, Export Report, Review AI Evaluation, Manual Review/Override, and queries stored job/progress states")
+    
+    Component(ops, "Platform Operations Component", "Express/Node.js", "Privileged Admin/Monitoring: Handles Support operations, platform health monitoring, user access control, and verifies data integrity")
+}
+
+' WORKER SERVICE CONTAINER
+Container_Boundary(worker, "Worker Service") {
+    
+    Component(job_ctrl, "Job & Cache Controller", "Node.js Worker", "Execution Routing: Manages jobs, scan progress, cache freshness, and reprocessing logic")
+    
+    Component(web_parser, "Web Parsing & Validation", "Node.js Worker", "Web Crawler: Performs safe request checks, HTTP status validation, redirects/errors handling, content retrieval, and structure extraction")
+    
+    Component(ai_client, "AI Evaluation Client", "Node.js Worker", "AI Integration: Executes prepared-content call to Anthropic API + handles response and AI failure states")
+}
+
+' INFRASTRUCTURE (Data Stores & Message Broker)
+ContainerDb(db, "Database", "PostgreSQL via Prisma", "Transactional Data: Stores accounts, workspaces, URL batches, scan results, cache data, and persistent application records (No logs)")
+ContainerDb(logging, "Structured Logging", "Structured JSON Events", "Operational Telemetry: Records operational, system, processing, and failure events separately from relational data")
+ContainerQueue(queue, "Task Queue", "Redis + BullMQ", "Message Broker: Temporarily holds URL validation tasks and distributes them for asynchronous processing")
+
+' RELATIONSHIPS: ACTORS TO API COMPONENTS
+Rel(seo, ingest, "Uploads URL batches via")
+Rel(seo, report, "Reviews results, overrides, and progress via")
+Rel(seo, iam, "Manages account via")
+
+Rel(owner, workspace, "Manages workspaces via")
+Rel(owner, report, "Reviews results and monitors team jobs via")
+Rel(owner, iam, "Manages account via")
+
+Rel(sysadmin, ops, "Manages platform access and system information via")
+Rel(sysadmin, workspace, "Manages workspaces via")
+Rel(sysadmin, iam, "Manages account via")
+
+Rel(support, ops, "Investigates and handles support cases via")
+Rel(support, iam, "Manages account via")
+
+Rel(operator, ops, "Monitors platform performance and initiatives via")
+Rel(operator, workspace, "Manages workspaces via")
+Rel(operator, iam, "Manages account via")
+
+' RELATIONSHIPS: API TO INFRASTRUCTURE
+Rel(ingest, queue, "Publishes URL validation tasks to")
+Rel(iam, db, "Reads/Writes account records")
+Rel(workspace, db, "Reads/Writes workspace records")
+Rel(report, db, "Reads transactional results, metrics, and progress")
+Rel(ops, db, "Reads/Writes admin and support records")
+
+Rel(iam, logging, "Emits authentication events to", "JSON")
+Rel(ingest, logging, "Emits upload/validation events to", "JSON")
+Rel(ops, logging, "Queries authorized operational/security events from", "JSON")
+
+' RELATIONSHIPS: QUEUE & WORKER EXECUTION
+Rel(queue, job_ctrl, "Delivers queued tasks to")
+Rel(job_ctrl, web_parser, "Routes live scrape tasks to")
+Rel(web_parser, target_sites, "Sends validation and content requests to", "HTTPS")
+Rel(web_parser, ai_client, "Passes extracted/prepared content to")
+Rel(ai_client, anthropic_api, "Sends prepared webpage content for evaluation to", "HTTPS/JSON")
+
+' RELATIONSHIPS: WORKER TO INFRASTRUCTURE
+Rel(job_ctrl, db, "Reads/Writes cache and freshness data")
+Rel(web_parser, db, "Writes normalized URLs and validation results")
+Rel(ai_client, db, "Writes AI classifications")
+
+Rel(job_ctrl, logging, "Emits processing/cache events to", "JSON")
+Rel(web_parser, logging, "Emits validation/network failure events to", "JSON")
+Rel(ai_client, logging, "Emits AI response/failure events to", "JSON")
+
+@enduml
