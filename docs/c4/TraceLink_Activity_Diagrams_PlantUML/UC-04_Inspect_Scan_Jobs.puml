@@ -1,0 +1,68 @@
+@startuml UC-04_Inspect_Scan_Jobs
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|System Administrator|
+start
+:Opens the internal "Job Inspection" view
+on the Admin Dashboard;
+|TraceLink System|
+:Verifies the internal role and permission;
+if (Has the required\ninternal permission?) then (No)
+  :Denies access and records the attempt;
+  end
+else (Yes)
+endif
+|System Administrator|
+:Searches for and selects a scan job;
+|TraceLink System|
+:Retrieves the job, cache, processing-failure, and
+worker/queue health records;
+if (Job or cache\nrecord found?) then (No)
+  :Displays a "Record not found" message;
+  end
+else (Yes)
+endif
+:Displays the job status, failed URLs, worker and queue health,
+and cache state (fresh, stale, failed, or unsuitable for reuse);
+if (Is the cached result\nfresh and reusable?) then (Yes)
+  :Retains the fresh cached result for reuse;
+else (No)
+  :Marks the cached result as stale or unsuitable for reuse;
+  |System Administrator|
+  if (Request a refresh\nor retry?) then (Yes)
+    :Clicks "Refresh Stale Results" or "Retry Failed Job";
+    |TraceLink System|
+    if (Eligible and can be\nscheduled?) then (Yes)
+      :Queues the URL for revalidation and keeps the
+      previous failure as history only;
+    else (No)
+      :Displays a "Refresh could not be scheduled" message
+      (not eligible, or worker/queue unavailable);
+    endif
+  else (No)
+  endif
+endif
+|TraceLink System|
+:Records the inspection action for traceability;
+|System Administrator|
+:Reviews the updated job and cache status;
+stop
+caption Figure X. UC-04 Inspect Scan Jobs
+@enduml
+

@@ -1,0 +1,63 @@
+@startuml UC-03_Monitor_Scan_Jobs
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|SEO Specialist, Workspace Owner|
+start
+:Navigates to the "Scan Monitoring" page;
+|TraceLink System|
+:Checks the user's access to the batch or workspace;
+if (Is access\nauthorized?) then (No)
+  :Denies access and displays an "Access denied" message;
+  end
+else (Yes)
+endif
+:Lists the user's active and recent scan jobs;
+if (Scan job\nfound?) then (No)
+  :Displays a "No scan jobs found" message;
+  end
+else (Yes)
+endif
+|SEO Specialist, Workspace Owner|
+:Selects an active or recent scan job;
+repeat
+  |TraceLink System|
+  :Retrieves the current scan-job state and progress
+  information from the database;
+  if (Monitoring data\navailable?) then (No)
+    :Displays the last known job state with a
+    "Data temporarily unavailable" notice;
+  else (Yes)
+    :Displays the job status (queued, active, completed, or failed)
+    and progress counts (total, processed, pending, failed);
+  endif
+  |SEO Specialist, Workspace Owner|
+  :Reviews the job status and the recorded
+  per-URL processing errors;
+  backward:Clicks "Refresh" to load the latest stored job state;
+repeat while (Is the scan job\nstill running?) is (Yes) not (No)
+|TraceLink System|
+:Displays the final job status and enables
+the "View Results" button;
+|SEO Specialist, Workspace Owner|
+:Clicks "View Results" to proceed to
+UC-02 Review Scan Results and Reports;
+stop
+caption Figure X. UC-03 Monitor Scan Jobs
+@enduml
+

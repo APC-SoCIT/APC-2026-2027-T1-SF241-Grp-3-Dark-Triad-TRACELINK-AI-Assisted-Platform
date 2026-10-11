@@ -1,0 +1,112 @@
+@startuml UC-01_Manage_Batch_URLs
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|SEO Specialist|
+start
+:Navigates to the "New Scan" page and selects
+the personal or workspace scope;
+repeat
+  |SEO Specialist|
+  :Clicks "Upload" and selects a CSV/XLSX file
+  containing the URL list;
+  |TraceLink System|
+  :Validates the file type, file size, and
+  presence of a supported URL column;
+  backward:Rejects the file and displays an upload error
+  (unsupported, unreadable, or missing URL column);
+repeat while (Is the file supported\nand readable?) is (No) not (Yes)
+:Parses the file, creates the URL_BATCH record, and stores
+each extracted row as a URL record in PostgreSQL;
+:Normalizes each URL and validates its format
+and supported protocol;
+if (Invalid or duplicate\nentries found?) then (Yes)
+  :Marks the invalid and duplicate rows with their input
+  status and excludes them from scanning;
+else (No)
+endif
+if (Any eligible URLs\nremaining?) then (No)
+  :Displays a message that the batch has no
+  processable URLs and keeps the batch record;
+  end
+else (Yes)
+endif
+:Displays the prepared batch summary (valid, invalid,
+duplicate, and total processable URLs);
+|SEO Specialist|
+:Reviews the prepared batch and the identified input issues;
+if (Initiate the\nbatch scan?) then (No)
+  :Leaves the prepared batch saved for later scanning;
+  end
+else (Yes)
+endif
+:Clicks "Start Scan";
+|TraceLink System|
+:Creates a scan job and queues the eligible URLs
+in the task queue (Redis/BullMQ);
+repeat
+  :Worker Service fetches the next queued URL;
+  if (Fresh cached result\navailable?) then (Yes)
+    :Reuses the cached result and records the cache reuse;
+  else (No)
+    :Treats the missing or stale cached result as
+    requiring automatic revalidation;
+    :Sends a controlled HTTP/HTTPS request, follows any
+    redirects, and records the redirect path;
+    if (Redirect chain within\nthe allowed limit?) then (No)
+      :Records a redirect-limit failure and skips AI evaluation;
+    else (Yes)
+      :Records the final destination and its HTTP status code;
+      if (Is the URL\naccessible?) then (No)
+        if (Retryable failure with\nretries remaining?) then (Yes)
+          :Re-queues the URL according to the retry policy;
+        else (No)
+          :Records the technical failure (404, blocked, rate-limited,
+          timeout, or network error) and skips AI evaluation;
+        endif
+      else (Yes)
+        :Retrieves the webpage and extracts the title, metadata,
+        headings, links, and interactive elements;
+        if (Sufficient content\nretrieved?) then (No)
+          :Keeps the technical result and records the
+          content-retrieval limitation;
+        else (Yes)
+          :Sends the prepared content and defined criteria
+          to the Anthropic Claude (Sonnet) API;
+          if (Valid AI evaluation\nreturned?) then (No)
+            :Records the AI evaluation failure and keeps the
+            technical and structure results;
+          else (Yes)
+            :Stores the AI-assisted findings (relevance, quality,
+            keyword alignment, spam-like indicators);
+          endif
+        endif
+      endif
+    endif
+    :Saves the URL result to PostgreSQL and
+    updates the result cache;
+  endif
+repeat while (Remaining URLs\nin the queue?) is (Yes) not (No)
+:Marks the scan job as completed and displays the
+per-URL statuses and findings;
+|SEO Specialist|
+:Reviews the resulting URL statuses and findings;
+stop
+caption Figure X. UC-01 Manage Batch URLs
+@enduml
+

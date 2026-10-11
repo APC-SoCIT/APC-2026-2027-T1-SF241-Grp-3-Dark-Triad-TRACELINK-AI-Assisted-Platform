@@ -1,0 +1,73 @@
+@startuml UC-07_Monitor_and_Manage_System_Operations
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|System Administrator, Operations / Support Staff, Project Team / Platform Operator|
+start
+:Opens the internal operations view;
+|TraceLink System|
+:Validates the internal role and permission;
+if (Is access\nauthorized?) then (No)
+  :Denies access and records the event;
+  end
+else (Yes)
+endif
+repeat
+  |System Administrator, Operations / Support Staff, Project Team / Platform Operator|
+  :Selects an operational task (support cases, platform metrics,
+  logs, accounts/access, security events, or data integrity);
+  |TraceLink System|
+  if (Is the task permitted\nfor the assigned role?) then (No)
+    :Denies the task and records the attempt;
+  else (Yes)
+    :Retrieves the authorized operational information
+    and read-only log/evidence records;
+    if (Data source\navailable?) then (No)
+      :Displays a "Source temporarily unavailable" notice;
+    else (Yes)
+      :Displays the operational status and relevant evidence;
+      |System Administrator, Operations / Support Staff, Project Team / Platform Operator|
+      :Reviews the information (e.g., filters logs by keyword,
+      checks failure summaries or usage metrics);
+      if (Action\nrequired?) then (Yes)
+        if (Requires\nescalation?) then (Yes)
+          :Escalates the issue to the appropriate internal role
+          (e.g., Support Staff to System Administrator);
+        else (No)
+          :Performs the action allowed by the assigned role (e.g., revokes
+          a compromised session, suspends a workspace, runs an integrity
+          check, resolves or reopens a support case);
+          |TraceLink System|
+          if (Conflicting action or\nfailed integrity check?) then (Yes)
+            :Blocks the unsafe action and preserves the evidence;
+          else (No)
+            :Applies the action while protecting unrelated user data;
+          endif
+        endif
+      else (No)
+      endif
+    endif
+    |TraceLink System|
+    :Records the action or event for traceability;
+  endif
+  |System Administrator, Operations / Support Staff, Project Team / Platform Operator|
+repeat while (Perform another\ninternal task?) is (Yes) not (No)
+stop
+caption Figure X. UC-07 Monitor and Manage System Operations
+@enduml
+

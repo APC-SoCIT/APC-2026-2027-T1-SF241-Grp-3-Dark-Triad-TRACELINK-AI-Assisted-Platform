@@ -1,0 +1,99 @@
+@startuml UC-02_Review_Scan_Results_and_Reports
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|SEO Specialist, Workspace Owner, System Administrator|
+start
+:Navigates to the "Scan Results" page and selects a batch;
+|TraceLink System|
+:Verifies the user's access to the batch or workspace;
+if (Is access\nauthorized?) then (No)
+  :Denies access and displays an "Access denied" message
+  without exposing the batch data;
+  end
+else (Yes)
+endif
+:Retrieves the scan results and the related
+webpage and AI analyses;
+if (Results\navailable?) then (No)
+  :Displays the current processing status or a
+  "No results available" message;
+  end
+else (Yes)
+endif
+:Displays the result summary (technical status, redirects,
+structure findings, AI evaluation, and error counts);
+|SEO Specialist, Workspace Owner, System Administrator|
+if (Search or filter to\nnarrow the results?) then (Yes)
+  :Enters a search term or selects filter criteria (status,
+  finding type, or AI classification) and clicks "Apply";
+  |TraceLink System|
+  :Queries the results with the active filters;
+  if (Matching results\nfound?) then (No)
+    :Displays a "No matching results" message
+    in the result table;
+    end
+  else (Yes)
+    :Re-renders the result table with the filtered results;
+  endif
+else (No)
+endif
+repeat
+  |SEO Specialist, Workspace Owner, System Administrator|
+  :Clicks a URL result to open its detail view;
+  |TraceLink System|
+  :Displays the original technical, structure, and AI-assisted
+  findings together with any manual-review state;
+  |SEO Specialist, Workspace Owner, System Administrator|
+  if (Is the result stale and\nneeds a manual refresh?) then (Yes)
+    :Clicks "Refresh Result";
+    |TraceLink System|
+    :Queues the URL for revalidation and displays
+    the result as "Refreshing";
+  else (No)
+  endif
+  |SEO Specialist, Workspace Owner, System Administrator|
+  if (Does the result\nrequire manual review?) then (Yes)
+    :Enters a review decision or override with notes
+    and clicks "Save Review";
+    |TraceLink System|
+    :Stores the review decision separately and preserves
+    the original automated result;
+  else (No)
+  endif
+  |SEO Specialist, Workspace Owner, System Administrator|
+repeat while (Review another\nURL result?) is (Yes) not (No)
+if (Generate a\nreport export?) then (Yes)
+  :Clicks "Export" and selects the export scope
+  and format (CSV/XLSX);
+  |TraceLink System|
+  :Generates the report file from the authorized results;
+  if (Export generated\nsuccessfully?) then (No)
+    :Displays an export error message;
+    end
+  else (Yes)
+    :Provides the report file for download and
+    records the export action;
+  endif
+else (No)
+endif
+|SEO Specialist, Workspace Owner, System Administrator|
+stop
+caption Figure X. UC-02 Review Scan Results and Reports
+@enduml
+

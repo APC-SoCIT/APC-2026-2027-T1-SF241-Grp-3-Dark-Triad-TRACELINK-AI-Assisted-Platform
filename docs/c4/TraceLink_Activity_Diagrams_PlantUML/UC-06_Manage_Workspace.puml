@@ -1,0 +1,129 @@
+@startuml UC-06_Manage_Workspace
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|Workspace Owner / Team Administrator|
+start
+:Navigates to the "Workspaces" page;
+if (Create a new\nworkspace?) then (Yes)
+  repeat
+    |Workspace Owner / Team Administrator|
+    :Clicks "Create Workspace" and enters the workspace
+    name, description, and team name;
+    |TraceLink System|
+    :Validates the workspace details;
+    backward:Displays a workspace validation error;
+  repeat while (Are the workspace\ndetails invalid?) is (Yes) not (No)
+  :Creates the workspace and assigns the creator
+  as Workspace Owner;
+else (No)
+  :Selects an existing workspace;
+endif
+|TraceLink System|
+:Validates workspace-owner permission;
+if (Has workspace-owner\npermission?) then (No)
+  :Displays a "Permission denied" message;
+  end
+else (Yes)
+endif
+:Opens the workspace dashboard;
+|Workspace Owner / Team Administrator|
+if (Manage workspace\nmembers?) then (Yes)
+  :Clicks "Manage Workspace Members";
+  |TraceLink System|
+  :Displays the current members, their roles,
+  and pending invitations;
+  |Workspace Owner / Team Administrator|
+  if (Invite a\nmember?) then (Yes)
+    :Enters the member's email and clicks "Invite to Workspace";
+    |TraceLink System|
+    if (Member already invited\nor present?) then (Yes)
+      :Displays a "Member already invited or present" message;
+    else (No)
+      :Sends an email containing the invitation link
+      and lists it as a pending invitation;
+    endif
+  elseif (Revoke a pending\ninvitation?) then (Yes)
+    |Workspace Owner / Team Administrator|
+    :Selects a pending invitation and clicks "Revoke";
+    |TraceLink System|
+    :Invalidates the invitation link and removes it
+    from the pending list;
+  elseif (Change a\nmember role?) then (Yes)
+    |Workspace Owner / Team Administrator|
+    :Selects a member, chooses a role, and clicks "Set Role";
+    |TraceLink System|
+    if (Prohibited ownership\nchange?) then (Yes)
+      :Rejects the change and keeps the current role;
+    else (No)
+      :Applies the role and notifies the member;
+    endif
+  elseif (Transfer workspace\nownership?) then (Yes)
+    |Workspace Owner / Team Administrator|
+    :Selects an active member, clicks "Transfer Ownership",
+    and confirms the transfer;
+    |TraceLink System|
+    if (Is the target an\nactive member?) then (Yes)
+      :Assigns the new Workspace Owner and changes the
+      previous owner's role, then notifies both;
+    else (No)
+      :Rejects the transfer and keeps the current owner;
+    endif
+  else (Remove)
+    |Workspace Owner / Team Administrator|
+    :Selects a member, clicks "Remove Member",
+    and confirms the removal;
+    |TraceLink System|
+    :Removes the member and sends a removal notification;
+  endif
+elseif (Edit workspace\nsettings?) then (Yes)
+  |Workspace Owner / Team Administrator|
+  :Clicks "Edit Workspace", updates the name, description,
+  and who may start scans or override findings,
+  then clicks "Save Changes";
+  |TraceLink System|
+  if (Updated settings\nvalid?) then (Yes)
+    :Saves the workspace settings and applies the permissions;
+  else (No)
+    :Displays a validation error and keeps
+    the previous settings;
+  endif
+else (Archive / Delete)
+  |Workspace Owner / Team Administrator|
+  :Clicks "Archive Workspace" or "Delete Workspace";
+  |TraceLink System|
+  :Displays a confirmation warning;
+  |Workspace Owner / Team Administrator|
+  if (Confirms the\naction?) then (Yes)
+    |TraceLink System|
+    if (Conditions prevent\nimmediate deletion?) then (Yes)
+      :Displays the blocking condition (e.g., active scan jobs);
+    else (No)
+      :Archives the workspace (read-only, records retained), or keeps
+      it deleted for 30 days before permanent removal;
+    endif
+  else (No)
+  endif
+endif
+|TraceLink System|
+:Records the resulting workspace state for traceability;
+|Workspace Owner / Team Administrator|
+stop
+caption Figure X. UC-06 Manage Workspace
+@enduml
+

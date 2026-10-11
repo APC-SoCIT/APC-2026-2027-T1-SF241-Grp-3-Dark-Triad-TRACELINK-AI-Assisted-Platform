@@ -1,0 +1,119 @@
+@startuml UC-05_Manage_Account
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 10
+skinparam ActivityBackgroundColor #F2F2F2
+skinparam ActivityBorderColor #6B6B6B
+skinparam ActivityFontSize 11
+skinparam ActivityDiamondBackgroundColor #FFFFFF
+skinparam ActivityDiamondBorderColor #000000
+skinparam ActivityDiamondFontSize 10
+skinparam ActivityStartColor #000000
+skinparam ActivityEndColor #000000
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 1
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneWidth same
+skinparam CaptionFontColor #44546A
+skinparam CaptionFontStyle italic
+|TraceLink User|
+start
+:Opens TraceLink in the browser;
+|TraceLink System|
+if (Does the user have an\nactive session?) then (No)
+  |TraceLink User|
+  if (Has an existing\naccount?) then (No)
+    repeat
+      |TraceLink User|
+      :Clicks "Sign Up", enters the full name, email, password,
+      and password confirmation, and accepts the Terms;
+      |TraceLink System|
+      :Validates the registration details and
+      checks that the email is unique;
+      backward:Displays a registration error
+      (email already used or weak password);
+    repeat while (Are the registration\ndetails invalid?) is (Yes) not (No)
+    :Creates the user account and records the event;
+  else (Yes)
+  endif
+  |TraceLink User|
+  if (Forgot the\npassword?) then (Yes)
+    :Clicks "Forgot Password" and enters the registered email;
+    |TraceLink System|
+    :Sends a password-reset link to the email;
+    |TraceLink User|
+    :Opens the reset link and enters a new password;
+    |TraceLink System|
+    if (Reset link valid and new\npassword accepted?) then (No)
+      :Displays an "Expired link or invalid password" message;
+      end
+    else (Yes)
+      :Updates the password and records the security event;
+    endif
+  else (No)
+  endif
+  repeat
+    |TraceLink User|
+    :Enters the username/email and password
+    and clicks "Log In";
+    |TraceLink System|
+    :Validates the credentials;
+    backward:Displays a login error and records
+    the failed attempt;
+  repeat while (Are the credentials\ninvalid?) is (Yes) not (No)
+  :Creates the session and loads the user's role
+  and authorized access;
+else (Yes)
+endif
+:Opens the authorized dashboard;
+|TraceLink User|
+if (Manage the\naccount?) then (Yes)
+  :Opens the account menu and selects Edit,
+  Archive, Delete, or Log Out;
+  |TraceLink System|
+  :Verifies the active session and the permission
+  for the selected action;
+  if (Is the action\npermitted?) then (No)
+    :Denies the action and records the event;
+    end
+  else (Yes)
+  endif
+  if (Edit\nselected?) then (Yes)
+    |TraceLink User|
+    :Updates the account details and clicks "Save Changes";
+    |TraceLink System|
+    if (Updated details\nvalid?) then (Yes)
+      :Saves the changes and refreshes the profile;
+    else (No)
+      :Displays a validation error and keeps
+      the previous details;
+    endif
+  elseif (Archive or Delete\nselected?) then (Yes)
+    :Displays a confirmation warning;
+    |TraceLink User|
+    if (Confirms the\naction?) then (Yes)
+      |TraceLink System|
+      if (Conflicts with ownership\nor system rules?) then (Yes)
+        :Rejects the request and explains the conflict;
+      else (No)
+        :Archives the account (hidden but retained) or deletes it
+        under the Data Privacy Act, then ends the session;
+      endif
+    else (No)
+    endif
+  else (Log Out)
+    |TraceLink User|
+    :Clicks "Log Out" and confirms;
+    |TraceLink System|
+    :Ends the session and returns to the login page;
+  endif
+  |TraceLink System|
+  :Records the account/security event for audit;
+else (No)
+endif
+|TraceLink User|
+stop
+caption Figure X. UC-05 Manage Account
+@enduml
+
