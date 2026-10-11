@@ -1,0 +1,72 @@
+@startuml URL Validation
+!pragma layout smetana
+title TraceLink — C4 Level 4 Code Diagram\nSprint 1: URL Validation and Result Persistence (Worker Service)
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+hide empty members
+
+package "Worker Service Container — src/" #EAF2FF {
+  class "worker.js" as WorkerModule <<module>> {
+    - TIMEOUT_MS = 10000
+    - MAX_REDIRECTS = 10
+    --
+    - classifyStatus(status)
+    - checkUrl(url)
+    - maybeCompleteJob(jobId)
+    + BullMQ job processor callback
+    + completed / failed event listeners
+  }
+  class "lib/prisma.js" as PrismaModule <<module>> {
+    + prisma : PrismaClient
+  }
+}
+
+package "Runtime / External Libraries" #F4F4F4 {
+  class "BullMQ Worker" as BullWorker <<library>> {
+    + queue name: url-scan
+    + concurrency: 5
+  }
+  class "ioredis" as RedisClient <<library>>
+  class "Node.js fetch()" as Fetch <<runtime API>>
+  class "Prisma Client" as PrismaClient <<library>>
+}
+
+package "Persisted Data Models" #F7F4E9 {
+  class "SCAN_RESULT" as ResultModel <<Prisma model>> {
+    + RES_HTTPStatus
+    + RES_StatusLabel
+    + RES_FinalURL
+    + RES_RedirectCount
+    + RES_ErrorType
+    + RES_CheckedAt
+  }
+  class "SCAN_JOB" as JobModel <<Prisma model>> {
+    + SCN_Status
+    + SCN_TotalURLs
+    + SCN_CompletedAt
+  }
+}
+
+WorkerModule ..> BullWorker : constructs with processor
+WorkerModule ..> RedisClient : opens queue connection
+WorkerModule ..> Fetch : checkUrl() sends requests
+WorkerModule ..> PrismaModule : uses
+PrismaModule ..> PrismaClient : instantiates
+WorkerModule ..> ResultModel : creates via Prisma
+WorkerModule ..> JobModel : reads / updates via Prisma
+
+note bottom of WorkerModule
+  checkUrl(): manually follows redirects,
+  times out requests, records network errors.
+  Processor persists one result per task,
+  then calls maybeCompleteJob().
+end note
+note bottom of BullWorker
+  Receives validate-url tasks published
+  by the Express API queue module.
+end note
+@enduml

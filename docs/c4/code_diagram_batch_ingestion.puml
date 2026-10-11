@@ -1,0 +1,80 @@
+@startuml Batch_Ingestion
+!pragma layout smetana
+title TraceLink — C4 Level 4 Code Diagram\nSprint 1: Batch Ingestion and Scan Initiation (Express API)
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+hide empty members
+
+package "Express API Container — src/" #EAF2FF {
+  class "index.js" as Index <<module>> {
+    + register batchRoutes at /api
+    + register scanRoutes at /api
+    + start Express server
+  }
+  class "routes/batches.js" as Batches <<module>> {
+    - normalizeUrl(raw)
+    + POST /batches
+    --
+    + parse CSV rows
+    + flag duplicate normalized URLs
+    + create URL_BATCH with URL records
+  }
+  class "routes/scan.js" as Scan <<module>> {
+    + POST /batches/:batchId/scan
+    --
+    + load URL batch
+    + create SCAN_JOB
+    + enqueue one task per URL
+    + update batch status
+  }
+  class "lib/prisma.js" as PrismaModule <<module>> {
+    + prisma : PrismaClient
+  }
+  class "queue/queue.js" as QueueModule <<module>> {
+    + connection : IORedis
+    + scanQueue : Queue
+  }
+}
+
+package "External Libraries" #F4F4F4 {
+  class "Multer" as Multer <<library>>
+  class "csv-parse/sync" as CsvParser <<library>>
+  class "Prisma Client" as PrismaClient <<library>>
+  class "BullMQ Queue" as BullMQ <<library>>
+  class "ioredis" as RedisClient <<library>>
+}
+
+package "Persisted Data Models" #F7F4E9 {
+  class "URL_BATCH" as BatchModel <<Prisma model>>
+  class "URL" as UrlModel <<Prisma model>>
+  class "SCAN_JOB" as JobModel <<Prisma model>>
+}
+
+Index ..> Batches : registers
+Index ..> Scan : registers
+Batches ..> Multer : receives uploaded file
+Batches ..> CsvParser : parses CSV
+Batches ..> PrismaModule : uses
+Scan ..> PrismaModule : uses
+Scan ..> QueueModule : uses
+PrismaModule ..> PrismaClient : instantiates
+QueueModule ..> BullMQ : creates queue
+QueueModule ..> RedisClient : creates connection
+Batches ..> BatchModel : creates via Prisma
+Batches ..> UrlModel : creates via Prisma
+Scan ..> BatchModel : reads / updates via Prisma
+Scan ..> JobModel : creates via Prisma
+
+note bottom of Batches
+  Actual prototype supports CSV parsing.
+  Invalid URLs are skipped during preparation.
+end note
+note bottom of Scan
+  Only the POST scan-initiation handler
+  is shown; result retrieval is Sprint 2.
+end note
+@enduml
