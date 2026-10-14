@@ -64,8 +64,7 @@ repeat
   if (Fresh cached result\navailable?) then (Yes)
     :Reuses the cached result and records the cache reuse;
   else (No)
-    :Treats the missing or stale cached result as
-    requiring automatic revalidation;
+    :Marks the URL for fresh technical validation;
     :Sends a controlled HTTP/HTTPS request, follows any
     redirects, and records the redirect path;
     if (Redirect chain within\nthe allowed limit?) then (No)
@@ -74,7 +73,8 @@ repeat
       :Records the final destination and its HTTP status code;
       if (Is the URL\naccessible?) then (No)
         if (Retryable failure with\nretries remaining?) then (Yes)
-          :Re-queues the URL according to the retry policy;
+          :Re-queues the URL according to the
+          configured retry limit;
         else (No)
           :Records the technical failure (404, blocked, rate-limited,
           timeout, or network error) and skips AI evaluation;

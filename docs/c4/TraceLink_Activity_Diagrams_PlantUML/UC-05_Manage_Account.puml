@@ -89,16 +89,27 @@ if (Manage the\naccount?) then (Yes)
       :Displays a validation error and keeps
       the previous details;
     endif
-  elseif (Archive or Delete\nselected?) then (Yes)
+  elseif (Archive\nselected?) then (Yes)
     :Displays a confirmation warning;
     |TraceLink User|
-    if (Confirms the\naction?) then (Yes)
+    if (Confirms the\narchive?) then (Yes)
       |TraceLink System|
-      if (Conflicts with ownership\nor system rules?) then (Yes)
-        :Rejects the request and explains the conflict;
+      :Deactivates the account while retaining
+      permitted records, then ends the session;
+    else (No)
+    endif
+  elseif (Delete\nselected?) then (Yes)
+    |TraceLink System|
+    :Displays a confirmation warning;
+    |TraceLink User|
+    if (Confirms the\ndeletion?) then (Yes)
+      |TraceLink System|
+      if (Owns a workspace that\nstill has members?) then (Yes)
+        :Blocks the deletion and asks the user to transfer
+        workspace ownership first (UC-06 Manage Workspace);
       else (No)
-        :Archives the account (hidden but retained) or deletes it
-        under the Data Privacy Act, then ends the session;
+        :Deletes or anonymizes eligible account data according
+        to the system's retention policy, then ends the session;
       endif
     else (No)
     endif

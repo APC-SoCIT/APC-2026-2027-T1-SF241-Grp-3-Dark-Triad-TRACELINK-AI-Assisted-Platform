@@ -111,11 +111,16 @@ else (Archive / Delete)
   |Workspace Owner / Team Administrator|
   if (Confirms the\naction?) then (Yes)
     |TraceLink System|
-    if (Conditions prevent\nimmediate deletion?) then (Yes)
-      :Displays the blocking condition (e.g., active scan jobs);
-    else (No)
-      :Archives the workspace (read-only, records retained), or keeps
-      it deleted for 30 days before permanent removal;
+    if (Delete\nselected?) then (Yes)
+      if (Ownership, dependency, and\nretention checks passed?) then (Yes)
+        :Removes the eligible workspace data;
+      else (No)
+        :Displays the blocking condition (e.g., active scan
+        jobs or records that must still be retained);
+      endif
+    else (Archive)
+      :Makes the workspace inactive and read-only
+      according to policy;
     endif
   else (No)
   endif

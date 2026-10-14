@@ -17,7 +17,7 @@ skinparam SwimlaneTitleFontSize 14
 skinparam SwimlaneWidth same
 skinparam CaptionFontColor #44546A
 skinparam CaptionFontStyle italic
-|SEO Specialist, Workspace Owner, System Administrator|
+|SEO Specialist, Workspace Owner / Team Administrator|
 start
 :Navigates to the "Scan Results" page and selects a batch;
 |TraceLink System|
@@ -38,7 +38,7 @@ else (Yes)
 endif
 :Displays the result summary (technical status, redirects,
 structure findings, AI evaluation, and error counts);
-|SEO Specialist, Workspace Owner, System Administrator|
+|SEO Specialist, Workspace Owner / Team Administrator|
 if (Search or filter to\nnarrow the results?) then (Yes)
   :Enters a search term or selects filter criteria (status,
   finding type, or AI classification) and clicks "Apply";
@@ -54,12 +54,12 @@ if (Search or filter to\nnarrow the results?) then (Yes)
 else (No)
 endif
 repeat
-  |SEO Specialist, Workspace Owner, System Administrator|
+  |SEO Specialist, Workspace Owner / Team Administrator|
   :Clicks a URL result to open its detail view;
   |TraceLink System|
   :Displays the original technical, structure, and AI-assisted
   findings together with any manual-review state;
-  |SEO Specialist, Workspace Owner, System Administrator|
+  |SEO Specialist, Workspace Owner / Team Administrator|
   if (Is the result stale and\nneeds a manual refresh?) then (Yes)
     :Clicks "Refresh Result";
     |TraceLink System|
@@ -67,7 +67,7 @@ repeat
     the result as "Refreshing";
   else (No)
   endif
-  |SEO Specialist, Workspace Owner, System Administrator|
+  |SEO Specialist, Workspace Owner / Team Administrator|
   if (Does the result\nrequire manual review?) then (Yes)
     :Enters a review decision or override with notes
     and clicks "Save Review";
@@ -76,7 +76,7 @@ repeat
     the original automated result;
   else (No)
   endif
-  |SEO Specialist, Workspace Owner, System Administrator|
+  |SEO Specialist, Workspace Owner / Team Administrator|
 repeat while (Review another\nURL result?) is (Yes) not (No)
 if (Generate a\nreport export?) then (Yes)
   :Clicks "Export" and selects the export scope
@@ -92,7 +92,7 @@ if (Generate a\nreport export?) then (Yes)
   endif
 else (No)
 endif
-|SEO Specialist, Workspace Owner, System Administrator|
+|SEO Specialist, Workspace Owner / Team Administrator|
 stop
 caption Figure X. UC-02 Review Scan Results and Reports
 @enduml

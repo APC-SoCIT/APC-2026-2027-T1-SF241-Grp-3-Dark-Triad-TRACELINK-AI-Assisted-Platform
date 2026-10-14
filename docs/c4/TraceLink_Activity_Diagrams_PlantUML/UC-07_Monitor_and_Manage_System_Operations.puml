@@ -29,29 +29,27 @@ else (Yes)
 endif
 repeat
   |System Administrator, Operations / Support Staff, Project Team / Platform Operator|
-  :Selects an operational task (support cases, platform metrics,
-  logs, accounts/access, security events, or data integrity);
+  :Selects an operational task (support, metrics,
+  logs, access, security, or data integrity);
   |TraceLink System|
   if (Is the task permitted\nfor the assigned role?) then (No)
     :Denies the task and records the attempt;
   else (Yes)
-    :Retrieves the authorized operational information
-    and read-only log/evidence records;
+    :Retrieves the authorized information and
+    read-only log/evidence records;
     if (Data source\navailable?) then (No)
       :Displays a "Source temporarily unavailable" notice;
     else (Yes)
       :Displays the operational status and relevant evidence;
       |System Administrator, Operations / Support Staff, Project Team / Platform Operator|
-      :Reviews the information (e.g., filters logs by keyword,
-      checks failure summaries or usage metrics);
+      :Reviews the information (e.g., filters logs by keyword);
       if (Action\nrequired?) then (Yes)
         if (Requires\nescalation?) then (Yes)
           :Escalates the issue to the appropriate internal role
           (e.g., Support Staff to System Administrator);
         else (No)
-          :Performs the action allowed by the assigned role (e.g., revokes
-          a compromised session, suspends a workspace, runs an integrity
-          check, resolves or reopens a support case);
+          :Performs the action allowed by the assigned role
+          (e.g., revokes a session, resolves a support case);
           |TraceLink System|
           if (Conflicting action or\nfailed integrity check?) then (Yes)
             :Blocks the unsafe action and preserves the evidence;

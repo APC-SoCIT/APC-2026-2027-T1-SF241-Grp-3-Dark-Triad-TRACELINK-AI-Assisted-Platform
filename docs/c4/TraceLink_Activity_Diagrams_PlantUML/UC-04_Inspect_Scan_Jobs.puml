@@ -41,7 +41,7 @@ endif
 :Displays the job status, failed URLs, worker and queue health,
 and cache state (fresh, stale, failed, or unsuitable for reuse);
 if (Is the cached result\nfresh and reusable?) then (Yes)
-  :Retains the fresh cached result for reuse;
+  :Keeps the fresh cached result eligible for reuse;
 else (No)
   :Marks the cached result as stale or unsuitable for reuse;
   |System Administrator|
